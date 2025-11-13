@@ -4,6 +4,8 @@
   gap: var(--spacing-xl);
   padding: var(--spacing-xl) var(--spacing-lg);
   position: relative;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .frameCompact {
@@ -54,11 +56,16 @@
 
 @media (max-width: 1200px) {
   .frame {
-    grid-template-columns: minmax(0, 0.6fr) minmax(0, var(--content-max));
+    grid-template-columns: 1fr;
+    padding: var(--spacing-xl) var(--spacing-md);
   }
 
-  .adPlaceholder {
-    width: 120px;
+  .adRail {
+    display: none;
+  }
+
+  .content {
+    max-width: 100%;
   }
 }
 

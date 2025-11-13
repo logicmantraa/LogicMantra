@@ -257,7 +257,7 @@
   .navlinks {
     position: fixed;
     top: 74px;
-    right: 16px;
+    right: 0;
     width: min(360px, 88%);
     height: calc(100vh - 90px);
     flex-direction: column;
@@ -269,15 +269,21 @@
       rgba(115, 14, 67, 0.9) 100%
     );
     padding: var(--spacing-2xl) var(--spacing-xl);
-    transform: translateX(120%);
+    transform: translateX(100%);
     gap: var(--spacing-lg);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
     box-shadow: var(--shadow-xl);
     z-index: 1201;
+    visibility: hidden;
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0s 0.3s;
   }
 
   .navlinks.open {
     transform: translateX(0);
+    visibility: visible;
+    opacity: 1;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0s 0s;
   }
 
   .navlinks a {
@@ -351,7 +357,7 @@
   }
 
   .navlinks {
-    right: 12px;
+    right: 0;
     width: min(340px, 92%);
     padding: var(--spacing-2xl) var(--spacing-lg);
   }
