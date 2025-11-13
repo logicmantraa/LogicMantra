@@ -25,7 +25,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // Local development
+    'https://logicmantraa.netlify.app', // Netlify URL
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
