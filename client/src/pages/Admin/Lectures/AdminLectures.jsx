@@ -14,7 +14,6 @@ export default function AdminLectures() {
     title: '',
     description: '',
     videoUrl: '',
-    duration: 0,
     isPreview: false
   })
 
@@ -59,7 +58,7 @@ export default function AdminLectures() {
       }
       setShowForm(false)
       setEditingLecture(null)
-      setFormData({ title: '', description: '', videoUrl: '', duration: 0, isPreview: false })
+      setFormData({ title: '', description: '', videoUrl: '', isPreview: false })
       loadLectures(selectedCourse)
     } catch (err) {
       alert(err.message || 'Failed to save lecture')
@@ -72,7 +71,6 @@ export default function AdminLectures() {
       title: lecture.title,
       description: lecture.description,
       videoUrl: lecture.videoUrl,
-      duration: lecture.duration,
       isPreview: lecture.isPreview
     })
     setShowForm(true)
@@ -152,26 +150,15 @@ export default function AdminLectures() {
                     required
                   />
                 </div>
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label>Duration (minutes)</label>
+                <div className={styles.formGroup}>
+                  <label className={styles.switchLabel}>
                     <input
-                      type="number"
-                      min="0"
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value || 0, 10) })}
+                      type="checkbox"
+                      checked={formData.isPreview}
+                      onChange={(e) => setFormData({ ...formData, isPreview: e.target.checked })}
                     />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.switchLabel}>
-                      <input
-                        type="checkbox"
-                        checked={formData.isPreview}
-                        onChange={(e) => setFormData({ ...formData, isPreview: e.target.checked })}
-                      />
-                      Make Preview
-                    </label>
-                  </div>
+                    Make Preview
+                  </label>
                 </div>
                 <div className={styles.formActions}>
                   <button type="submit">Save</button>
@@ -191,7 +178,6 @@ export default function AdminLectures() {
                 <h3>{lecture.title}</h3>
                 <p>{lecture.description || 'No description provided'}</p>
                 <div className={styles.meta}>
-                  <span>{lecture.duration} min</span>
                   {lecture.isPreview && <span className={styles.preview}>Preview</span>}
                 </div>
               </div>

@@ -25,7 +25,6 @@ export default function CourseDetail() {
     description: '',
     videoUrl: '',
     order: 1,
-    duration: 0,
     isPreview: false
   })
   const [resourceForm, setResourceForm] = useState({
@@ -96,7 +95,6 @@ export default function CourseDetail() {
       description: '',
       videoUrl: '',
       order: lectures.length + 1,
-      duration: 0,
       isPreview: false
     })
     setShowLectureModal(true)
@@ -120,8 +118,7 @@ export default function CourseDetail() {
       await lectureAPI.createLecture({
         ...lectureForm,
         courseId: id,
-        order: Number(lectureForm.order) || lectures.length + 1,
-        duration: Number(lectureForm.duration) || 0
+        order: Number(lectureForm.order) || lectures.length + 1
       })
       setShowLectureModal(false)
       await loadCourseData()
@@ -359,27 +356,16 @@ export default function CourseDetail() {
                   required
                 />
               </label>
-              <div className={styles.formRow}>
-                <label>
-                  Order
-                  <input
-                    type="number"
-                    min="1"
-                    value={lectureForm.order}
-                    onChange={(e) => setLectureForm((prev) => ({ ...prev, order: e.target.value }))}
-                    required
-                  />
-                </label>
-                <label>
-                  Duration (min)
-                  <input
-                    type="number"
-                    min="0"
-                    value={lectureForm.duration}
-                    onChange={(e) => setLectureForm((prev) => ({ ...prev, duration: e.target.value }))}
-                  />
-                </label>
-              </div>
+              <label>
+                Order
+                <input
+                  type="number"
+                  min="1"
+                  value={lectureForm.order}
+                  onChange={(e) => setLectureForm((prev) => ({ ...prev, order: e.target.value }))}
+                  required
+                />
+              </label>
               <label className={styles.checkboxField}>
                 <input
                   type="checkbox"

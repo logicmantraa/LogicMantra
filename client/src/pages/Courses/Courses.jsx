@@ -15,8 +15,7 @@ const initialCourseForm = {
   isFree: true,
   category: '',
   level: 'Beginner',
-  thumbnail: '',
-  duration: 0
+  thumbnail: ''
 }
 
 export default function Courses() {
@@ -92,8 +91,7 @@ export default function Courses() {
         isFree: course.isFree ?? false,
         category: course.category || '',
         level: course.level || 'Beginner',
-        thumbnail: course.thumbnail || '',
-        duration: course.duration || 0
+        thumbnail: course.thumbnail || ''
       })
     } else {
       setEditingCourse(null)
@@ -111,7 +109,7 @@ export default function Courses() {
   const handleCourseChange = (field, value) => {
     setCourseForm((prev) => ({
       ...prev,
-      [field]: field === 'price' || field === 'duration' ? Number(value) : value
+      [field]: field === 'price' ? Number(value) : value
     }))
   }
 
@@ -270,7 +268,6 @@ export default function Courses() {
                   <div className={styles.cardBody}>
                     <div className={styles.cardMeta}>
                       <span className={styles.levelBadge}>{course.level}</span>
-                      <span className={styles.duration}>{course.duration ? `${course.duration} min` : 'Self-paced'}</span>
                     </div>
                     <h3>{course.title}</h3>
                     <p className={styles.description}>
@@ -373,15 +370,6 @@ export default function Courses() {
                     value={courseForm.price}
                     onChange={(e) => handleCourseChange('price', e.target.value)}
                     disabled={courseForm.isFree}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Duration (minutes)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={courseForm.duration}
-                    onChange={(e) => handleCourseChange('duration', e.target.value)}
                   />
                 </div>
                 <div className={`${styles.formGroup} ${styles.switchGroup}`}>
