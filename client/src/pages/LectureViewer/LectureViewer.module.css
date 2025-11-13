@@ -247,6 +247,238 @@
   font-weight: 600;
 }
 
+.restrictedContainer {
+  max-width: 800px;
+  margin: var(--spacing-2xl) auto;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--spacing-2xl);
+  text-align: center;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.restrictedIcon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 122, 26, 0.1), rgba(255, 31, 148, 0.1));
+  border-radius: var(--radius-full);
+  color: var(--primary-600);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.restrictedTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.restrictedSubtitle {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-2xl);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.coursePreview {
+  background: linear-gradient(135deg, rgba(255, 122, 26, 0.05), rgba(255, 31, 148, 0.05));
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-2xl);
+  margin: var(--spacing-2xl) 0;
+  border: 2px solid rgba(255, 122, 26, 0.1);
+}
+
+.coursePreviewHeader {
+  margin-bottom: var(--spacing-xl);
+}
+
+.coursePreviewHeader h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--spacing-xs);
+}
+
+.coursePreviewHeader .instructor {
+  color: var(--gray-600);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.courseStats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-lg) 0;
+  border-top: 1px solid rgba(255, 122, 26, 0.1);
+  border-bottom: 1px solid rgba(255, 122, 26, 0.1);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--gray-700);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.statItem svg {
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+.courseDescription {
+  color: var(--gray-600);
+  line-height: 1.7;
+  text-align: left;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: white;
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--primary-500);
+}
+
+.benefits {
+  text-align: left;
+  margin: var(--spacing-2xl) 0;
+  padding: var(--spacing-xl);
+  background: var(--gray-50);
+  border-radius: var(--radius-xl);
+}
+
+.benefits h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.benefitItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.benefitItem:hover {
+  transform: translateX(8px);
+  box-shadow: var(--shadow-md);
+}
+
+.benefitItem svg {
+  color: var(--primary-600);
+  flex-shrink: 0;
+}
+
+.benefitItem span {
+  color: var(--gray-700);
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-2xl);
+}
+
+.enrollBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+}
+
+.enrollBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.enrollBtn:active {
+  transform: translateY(-1px);
+}
+
+.enrollBtn svg {
+  flex-shrink: 0;
+}
+
+.viewDetailsBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--primary-600);
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid var(--primary-500);
+  transition: all var(--transition-fast);
+}
+
+.viewDetailsBtn:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-600);
+  transform: translateY(-2px);
+}
+
 .contentMessage {
   background: white;
   padding: var(--spacing-2xl);
@@ -287,6 +519,55 @@
 
   .header h1 {
     font-size: 1.8rem;
+  }
+
+  .restrictedContainer {
+    padding: var(--spacing-xl);
+    margin: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .restrictedTitle {
+    font-size: 1.8rem;
+  }
+
+  .restrictedSubtitle {
+    font-size: 1rem;
+  }
+
+  .coursePreview {
+    padding: var(--spacing-lg);
+  }
+
+  .coursePreviewHeader h2 {
+    font-size: 1.4rem;
+  }
+
+  .courseStats {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+
+  .statItem {
+    width: 100%;
+  }
+
+  .benefits {
+    padding: var(--spacing-lg);
+  }
+
+  .benefits h3 {
+    font-size: 1.2rem;
+  }
+
+  .enrollBtn {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: 1rem;
+  }
+
+  .viewDetailsBtn {
+    width: 100%;
   }
 }
 

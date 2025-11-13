@@ -100,6 +100,23 @@ export default function LectureViewer() {
     return <ProtectedRoute>{loadingState}</ProtectedRoute>
   }
 
+  const handleEnroll = async () => {
+    if (!user) {
+      alert('Please login to enroll')
+      return
+    }
+
+    try {
+      await enrollmentAPI.enroll(courseId)
+      setEnrolled(true)
+      alert('Successfully enrolled! You can now access the course content.')
+      // Reload data to show the lecture
+      loadData()
+    } catch (err) {
+      alert(err.message || 'Failed to enroll')
+    }
+  }
+
   if (!enrolled && !currentLecture?.isPreview) {
     return (
       <ProtectedRoute>
@@ -108,13 +125,109 @@ export default function LectureViewer() {
             <Link to={`/courses/${courseId}`} className={styles.backLink}>
               ← Back to Course
             </Link>
-            <h1>Access Restricted</h1>
-            <p className={styles.courseTitle}>Enroll to continue learning.</p>
           </div>
-          <div className={styles.contentMessage}>
-            <Link to={`/courses/${courseId}`} className={styles.primaryAction}>
-              View Course Details
-            </Link>
+          
+          <div className={styles.restrictedContainer}>
+            <div className={styles.restrictedIcon}>
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor" opacity="0.3"/>
+                <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 20c-4.96 0-9-4.04-9-9s4.04-9 9-9 9 4.04 9 9-4.04 9-9 9zm-1-13h2v6h-2zm0 8h2v2h-2z" fill="currentColor"/>
+              </svg>
+            </div>
+            
+            <h1 className={styles.restrictedTitle}>Enroll to Access Course Content</h1>
+            <p className={styles.restrictedSubtitle}>
+              This course requires enrollment. Join now to unlock all lectures, resources, and start your learning journey!
+            </p>
+
+            {course && (
+              <div className={styles.coursePreview}>
+                <div className={styles.coursePreviewHeader}>
+                  <h2>{course.title}</h2>
+                  <p className={styles.instructor}>By {course.instructor}</p>
+                </div>
+                
+                <div className={styles.courseStats}>
+                  <div className={styles.statItem}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>{lectures.length} Lectures</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>{resources.length} Resources</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <span>{course.level || 'All Levels'}</span>
+                  </div>
+                  {course.rating && (
+                    <div className={styles.statItem}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                      <span>{course.rating.toFixed(1)} Rating</span>
+                    </div>
+                  )}
+                </div>
+
+                {course.description && (
+                  <p className={styles.courseDescription}>{course.description}</p>
+                )}
+              </div>
+            )}
+
+            <div className={styles.benefits}>
+              <h3>What you'll get:</h3>
+              <div className={styles.benefitsList}>
+                <div className={styles.benefitItem}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Access to all {lectures.length} video lectures</span>
+                </div>
+                <div className={styles.benefitItem}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Downloadable resources and practice materials</span>
+                </div>
+                <div className={styles.benefitItem}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Track your progress and earn certificates</span>
+                </div>
+                <div className={styles.benefitItem}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Lifetime access to course updates</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.actionButtons}>
+              <button onClick={handleEnroll} className={styles.enrollBtn}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 13l4 4L19 7"></path>
+                </svg>
+                {course?.isFree ? 'Enroll for Free' : `Enroll Now - ${course?.price ? `₹${course.price}` : 'Paid'}`}
+              </button>
+              <Link to={`/courses/${courseId}`} className={styles.viewDetailsBtn}>
+                View Full Course Details
+              </Link>
+            </div>
           </div>
         </PageShell>
       </ProtectedRoute>
