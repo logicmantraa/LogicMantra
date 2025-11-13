@@ -135,6 +135,12 @@
   font-weight: 500;
 }
 
+.phoneNumber {
+  color: var(--gray-600);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
 .metaGrid {
   width: 100%;
   display: grid;
@@ -246,6 +252,13 @@
 .formGroup textarea:disabled {
   background: var(--gray-100);
   cursor: not-allowed;
+}
+
+.fieldHint {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin-top: var(--spacing-xs);
+  font-style: italic;
 }
 
 .formActions {

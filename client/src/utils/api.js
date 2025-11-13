@@ -85,9 +85,9 @@ export const enrollmentAPI = {
   }),
   getMyEnrollments: () => apiRequest('/enrollments/my-courses'),
   checkEnrollment: (courseId) => apiRequest(`/enrollments/check/${courseId}`),
-  updateProgress: (enrollmentId, progress, lectureId) => apiRequest(`/enrollments/${enrollmentId}/progress`, {
+  updateProgress: (enrollmentId, lectureId) => apiRequest(`/enrollments/${enrollmentId}/progress`, {
     method: 'PUT',
-    body: { progress, lectureId },
+    body: { lectureId },
   }),
 };
 

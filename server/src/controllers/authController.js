@@ -6,7 +6,7 @@ import generateToken from '../utils/generateToken.js';
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phoneNumber } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -19,6 +19,7 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password,
+      phoneNumber: phoneNumber || '',
     });
 
     if (user) {
@@ -26,6 +27,7 @@ export const registerUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phoneNumber: user.phoneNumber,
         isAdmin: user.isAdmin,
         token: generateToken(user._id),
       });
@@ -56,6 +58,7 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phoneNumber: user.phoneNumber,
         isAdmin: user.isAdmin,
         token: generateToken(user._id),
       });
@@ -84,6 +87,7 @@ export const getUserProfile = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phoneNumber: user.phoneNumber,
         isAdmin: user.isAdmin,
       });
     } else {
@@ -109,6 +113,9 @@ export const updateUserProfile = async (req, res) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
+      if (req.body.phoneNumber !== undefined) {
+        user.phoneNumber = req.body.phoneNumber || '';
+      }
 
       const updatedUser = await user.save();
 
@@ -116,6 +123,7 @@ export const updateUserProfile = async (req, res) => {
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
         isAdmin: updatedUser.isAdmin,
         token: generateToken(updatedUser._id),
       });

@@ -27,9 +27,6 @@ export default function SearchBar({ onSearch, placeholder = 'Search...', classNa
         onChange={handleChange}
         className={styles.input}
       />
-      <button type="submit" className={styles.button}>
-        Search
-      </button>
     </form>
   )
 }

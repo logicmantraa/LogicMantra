@@ -51,7 +51,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className={styles.valuesSection}>
+      <section className={`${styles.sectionWrapper} ${styles.valuesSection}`}>
         <h2>What We Stand For</h2>
         <div className={styles.valuesGrid}>
           {values.map((value) => (
@@ -63,7 +63,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className={styles.storySection}>
+      <section className={`${styles.sectionWrapper} ${styles.storySection}`}>
         <div className={styles.storyContent}>
           <h2>Our Story</h2>
           <p>
@@ -93,7 +93,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className={styles.contactSection}>
+      <section className={`${styles.sectionWrapper} ${styles.contactSection}`}>
         <div className={styles.contactIntro}>
           <h2>Let’s Build Something Extraordinary</h2>
           <p>
@@ -140,7 +140,7 @@ export default function About() {
         </form>
       </section>
 
-      <section className={styles.mapSection}>
+      <section className={`${styles.sectionWrapper} ${styles.mapSection}`}>
         <div className={styles.mapCard}>
           <h2>Where You’ll Find Us</h2>
           <p>

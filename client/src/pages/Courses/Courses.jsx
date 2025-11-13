@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { courseAPI } from '../../utils/api'
@@ -37,6 +37,16 @@ export default function Courses() {
     loadCourses()
   }, [searchTerm, filters])
 
+  const courseCategories = useMemo(() => {
+    const unique = new Set()
+    courses.forEach((course) => {
+      if (course.category) {
+        unique.add(course.category)
+      }
+    })
+    return Array.from(unique)
+  }, [courses])
+
   const loadCourses = async () => {
     setLoading(true)
     try {
@@ -61,6 +71,14 @@ export default function Courses() {
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters)
+  }
+
+  const handleCategoryClick = (category) => {
+    setFilters((prev) => ({
+      ...prev,
+      category: prev.category === category ? '' : category
+    }))
+    setFiltersOpen(false)
   }
 
   const openCourseModal = (course = null) => {
@@ -125,114 +143,168 @@ export default function Courses() {
     }
   }
 
+  const toggleFilters = () => {
+    setFiltersOpen((prev) => !prev)
+  }
+
+  const courseStats = [
+    { label: 'Courses', value: courses.length || 0 },
+    { label: 'Free Tracks', value: courses.filter((course) => course.isFree).length },
+    { label: 'Mentors', value: new Set(courses.map((course) => course.instructor)).size },
+    { label: 'Average Rating', value: courses.length ? `${(courses.reduce((sum, course) => sum + (course.rating || 0), 0) / courses.length).toFixed(1)}★` : '—' }
+  ]
+
   return (
-    <PageShell contentClassName={styles.container}>
-      <div className={styles.headerRow}>
-        <div>
-          <p className={styles.kicker}>Explore</p>
-          <h1 className={styles.title}>Discover Courses Crafted For Impact</h1>
-          <p className={styles.subtitle}>
-            Browse courses tailored to boost your skills. Filter by level, category, or rating to find the perfect match.
+    <PageShell contentClassName={styles.page}>
+      <section className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <span className={styles.heroPill}>Curated Learning Tracks</span>
+          <h1>Discover Courses Crafted For Impact</h1>
+          <p>
+            Browse learning journeys designed to help you master in-demand skills with hands-on projects, expert mentors,
+            and resources tailored to your goals.
           </p>
         </div>
-        {!loading && courses.length > 0 && (
-          <div className={styles.statsBar}>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{courses.length}</span>
-              <span className={styles.statLabel}>Courses</span>
+        <div className={styles.heroStats}>
+          {courseStats.map((stat) => (
+            <div key={stat.label} className={styles.statCard}>
+              <span className={styles.statValue}>{stat.value}</span>
+              <span className={styles.statLabel}>{stat.label}</span>
             </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{courses.filter((course) => course.isFree).length}</span>
-              <span className={styles.statLabel}>Free</span>
-            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.toolbar}>
+        <div className={styles.searchRow}>
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Search by course name, instructor, or keyword..."
+            className={styles.searchBar}
+          />
+          <div className={styles.actionGroup}>
+            <button className={styles.filterButton} onClick={toggleFilters} type="button">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 6H20M6 12H18M10 18H14"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Filters
+            </button>
+            {isAdmin && (
+              <button className={styles.addCourseBtn} onClick={() => openCourseModal()} type="button">
+                + New Course
+              </button>
+            )}
+          </div>
+        </div>
+
+        {courseCategories.length > 0 && (
+          <div className={styles.categoryScroller}>
+            <button
+              type="button"
+              onClick={() => handleCategoryClick('')}
+              className={`${styles.categoryChip} ${!filters.category ? styles.active : ''}`}
+            >
+              All Tracks
+            </button>
+            {courseCategories.map((category) => (
+              <button
+                type="button"
+                key={category}
+                onClick={() => handleCategoryClick(category)}
+                className={`${styles.categoryChip} ${filters.category === category ? styles.active : ''}`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <div className={styles.resultsArea}>
+        <div className={styles.resultsTopBar}>
+          <p className={styles.resultsSummary}>
+            {loading ? 'Refreshing catalogue…' : `Showing ${courses.length} curated ${courses.length === 1 ? 'course' : 'courses'}`}
+          </p>
+          <div className={styles.adPlaceholder}>Reserved space for spotlight announcements & future promotions</div>
+        </div>
+
+        {loading ? (
+          <div className={styles.loading}>Loading courses...</div>
+        ) : courses.length === 0 ? (
+          <div className={styles.noCourses}>
+            <h3>No courses match your filters yet</h3>
+            <p>Try adjusting your filters or exploring a different category.</p>
+          </div>
+        ) : (
+          <div className={styles.courseGrid}>
+            {courses.map((course) => (
+              <article key={course._id} className={styles.courseCard}>
+                {isAdmin && (
+                  <div className={styles.courseActions}>
+                    <button type="button" onClick={() => openCourseModal(course)} className={styles.actionBtn}>
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCourseDelete(course)}
+                      className={`${styles.actionBtn} ${styles.delete}`}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+                <Link to={`/courses/${course._id}`} className={styles.courseLink}>
+                  <div className={styles.thumbnail}>
+                    {course.thumbnail ? (
+                      <img src={course.thumbnail} alt={course.title} />
+                    ) : (
+                      <div className={styles.placeholder}>LM</div>
+                    )}
+                  </div>
+                  <div className={styles.cardBody}>
+                    <div className={styles.cardMeta}>
+                      <span className={styles.levelBadge}>{course.level}</span>
+                      <span className={styles.duration}>{course.duration ? `${course.duration} min` : 'Self-paced'}</span>
+                    </div>
+                    <h3>{course.title}</h3>
+                    <p className={styles.description}>
+                      {(course.description || 'No description available').substring(0, 140)}...
+                    </p>
+                    <div className={styles.cardFooter}>
+                      <div className={styles.instructorBlock}>
+                        <span className={styles.label}>Instructor</span>
+                        <span className={styles.value}>{course.instructor}</span>
+                      </div>
+                      <div className={styles.pricingBlock}>
+                        <span className={styles.value}>{course.isFree ? 'Free' : `₹${course.price}`}</span>
+                        <span className={styles.rating}>
+                          ★ {typeof course.rating === 'number' ? course.rating.toFixed(1) : 'New'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </article>
+            ))}
           </div>
         )}
       </div>
 
-      <div className={styles.controls}>
-        <SearchBar
-          onSearch={handleSearch}
-          placeholder="Search by course name, instructor, or keyword..."
-          className={styles.search}
-        />
-        <div className={styles.controlButtons}>
-          <button
-            className={styles.filterToggle}
-            onClick={() => setFiltersOpen((prev) => !prev)}
-            type="button"
-          >
-            <span>Advanced Filters</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M4 6H20M6 12H18M10 18H14"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          {isAdmin && (
-            <button className={styles.addCourseBtn} onClick={() => openCourseModal()} type="button">
-              + Add Course
+      {filtersOpen && (
+        <div className={styles.filterSheet}>
+          <div className={styles.filterHeader}>
+            <span>Refine Results</span>
+            <button onClick={toggleFilters} type="button" aria-label="Close filters">
+              ✕
             </button>
-          )}
-        </div>
-      </div>
-
-      <div className={`${styles.filterPanelWrapper} ${filtersOpen ? styles.open : ''}`}>
-        <FilterPanel onFilterChange={handleFilterChange} filters={filters} />
-      </div>
-
-      <div className={styles.adPlaceholder}>Sponsored learning spotlight – future ad placement</div>
-
-      {loading ? (
-        <div className={styles.loading}>Loading courses...</div>
-      ) : courses.length === 0 ? (
-        <div className={styles.noCourses}>No courses found</div>
-      ) : (
-        <div className={styles.courseGrid}>
-          {courses.map((course) => (
-            <div key={course._id} className={styles.courseCard}>
-              {isAdmin && (
-                <div className={styles.courseActions}>
-                  <button type="button" onClick={() => openCourseModal(course)} className={styles.actionBtn}>
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleCourseDelete(course)}
-                    className={`${styles.actionBtn} ${styles.delete}`}
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
-              <Link to={`/courses/${course._id}`} className={styles.courseLink}>
-                <div className={styles.thumbnail}>
-                  {course.thumbnail ? (
-                    <img src={course.thumbnail} alt={course.title} />
-                  ) : (
-                    <div className={styles.placeholder}>No Image</div>
-                  )}
-                </div>
-                <div className={styles.content}>
-                  <h3>{course.title}</h3>
-                  <p className={styles.instructor}>By {course.instructor}</p>
-                  <p className={styles.description}>
-                    {(course.description || 'No description available').substring(0, 120)}...
-                  </p>
-                  <div className={styles.meta}>
-                    <span className={styles.level}>{course.level}</span>
-                    <span className={styles.rating}>
-                      ★ {typeof course.rating === 'number' ? course.rating.toFixed(1) : 'New'}
-                    </span>
-                    <span className={styles.price}>{course.isFree ? 'Free' : `₹${course.price}`}</span>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+          </div>
+          <FilterPanel onFilterChange={handleFilterChange} filters={filters} />
         </div>
       )}
 
@@ -344,6 +416,8 @@ export default function Courses() {
           </div>
         </div>
       )}
+
+      {filtersOpen && <div className={styles.filterOverlay} onClick={toggleFilters} />}
     </PageShell>
   )
 }

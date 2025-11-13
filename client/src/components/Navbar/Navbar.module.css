@@ -264,9 +264,9 @@
     align-items: flex-start;
     background: linear-gradient(
       180deg,
-      rgba(255, 122, 26, 0.95) 0%,
-      rgba(255, 31, 148, 0.92) 55%,
-      rgba(115, 14, 67, 0.94) 100%
+      rgba(255, 122, 26, 0.92) 0%,
+      rgba(255, 31, 148, 0.88) 55%,
+      rgba(115, 14, 67, 0.9) 100%
     );
     padding: var(--spacing-2xl) var(--spacing-xl);
     transform: translateX(120%);
@@ -283,6 +283,12 @@
   .navlinks a {
     font-size: 1.1rem;
     width: 100%;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.08);
+    transition: transform var(--transition-fast),
+      box-shadow var(--transition-fast),
+      background var(--transition-fast),
+      color var(--transition-fast);
   }
 
   .authGroup,
@@ -292,11 +298,22 @@
     width: 100%;
   }
 
+  .navlinks a::before {
+    display: none;
+  }
+
+  .navlinks a:hover {
+    transform: translateX(10px) scale(1.02);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.15);
+    color: white;
+  }
+
   .adminDropdown {
     position: static;
     width: 100%;
     box-shadow: none;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.18);
     margin-top: var(--spacing-sm);
   }
 
@@ -306,7 +323,7 @@
   }
 
   .adminDropdown a:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.3);
     color: white;
   }
 

@@ -1,12 +1,22 @@
 .page {
   background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+}
+
+.sectionWrapper {
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
 }
 
 .heroSection {
-  max-width: 1400px;
+  width: min(100%, 1280px);
   margin: var(--spacing-xl) auto;
-  padding: 0 var(--spacing-lg);
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
   display: grid;
   grid-template-columns: 1.5fr 1fr;
   gap: var(--spacing-2xl);
@@ -16,14 +26,14 @@
 .heroContent .kicker {
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1.4vw, 0.8rem);
   color: var(--primary-600);
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
 }
 
 .heroContent h1 {
-  font-size: 3.2rem;
+  font-size: clamp(2.1rem, 4.5vw, 3.2rem);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: var(--spacing-lg);
@@ -32,18 +42,20 @@
 
 .heroContent p {
   color: var(--gray-600);
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
   line-height: 1.8;
 }
 
 .heroCards {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--spacing-lg);
+  width: 100%;
 }
 
 .highlightCard {
   background: white;
-  padding: var(--spacing-xl);
+  padding: clamp(1rem, 3.5vw, var(--spacing-xl));
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   text-align: center;
@@ -52,7 +64,7 @@
 
 .highlightNumber {
   display: block;
-  font-size: 2.6rem;
+  font-size: clamp(2rem, 4vw, 2.6rem);
   font-weight: 800;
   background: linear-gradient(135deg, var(--primary-600), var(--secondary-600));
   -webkit-background-clip: text;
@@ -66,31 +78,32 @@
 }
 
 .valuesSection {
+  width: min(100%, 1280px);
   background: white;
-  padding: var(--spacing-2xl) var(--spacing-lg);
+  padding: var(--spacing-2xl) clamp(1rem, 5vw, 2.5rem);
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .valuesSection h2 {
-  max-width: 1400px;
-  margin: 0 auto var(--spacing-xl);
-  font-size: 2.5rem;
+  margin-bottom: var(--spacing-xl);
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 700;
   color: var(--gray-900);
   text-align: center;
 }
 
 .valuesGrid {
-  max-width: 1400px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--spacing-xl);
 }
 
 .valueCard {
   background: rgba(14, 165, 233, 0.08);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-2xl);
+  padding: clamp(1.25rem, 3vw, var(--spacing-2xl));
   box-shadow: var(--shadow);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -113,9 +126,9 @@
 }
 
 .storySection {
-  max-width: 1400px;
+  width: min(100%, 1280px);
   margin: var(--spacing-2xl) auto;
-  padding: 0 var(--spacing-lg);
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: var(--spacing-2xl);
@@ -123,7 +136,7 @@
 }
 
 .storyContent h2 {
-  font-size: 2.4rem;
+  font-size: clamp(2rem, 3.8vw, 2.4rem);
   font-weight: 700;
   margin-bottom: var(--spacing-lg);
   color: var(--gray-900);
@@ -133,6 +146,7 @@
   color: var(--gray-600);
   line-height: 1.8;
   margin-bottom: var(--spacing-lg);
+  font-size: clamp(1rem, 2vw, 1.1rem);
 }
 
 .timeline {
@@ -148,6 +162,7 @@
   box-shadow: var(--shadow-md);
   position: relative;
   padding-left: var(--spacing-2xl);
+  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
 }
 
 .timelineYear {
@@ -165,12 +180,12 @@
 }
 
 .contactSection {
+  width: min(100%, 1280px);
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: var(--spacing-2xl);
-  max-width: 1400px;
   margin: var(--spacing-2xl) auto;
-  padding: 0 var(--spacing-lg);
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
 }
 
 .contactIntro {
@@ -184,7 +199,7 @@
 }
 
 .contactIntro h2 {
-  font-size: 2.2rem;
+  font-size: clamp(1.9rem, 3.5vw, 2.2rem);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -230,7 +245,7 @@
   background: white;
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
-  padding: var(--spacing-2xl);
+  padding: clamp(1.25rem, 3vw, var(--spacing-2xl));
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -287,8 +302,12 @@
 }
 
 .mapSection {
+  width: min(100%, 1280px);
   background: white;
-  padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-2xl);
+  padding: var(--spacing-2xl) clamp(1rem, 5vw, 2.5rem);
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .mapCard {
@@ -301,7 +320,7 @@
 }
 
 .mapCard h2 {
-  font-size: 2rem;
+  font-size: clamp(1.6rem, 3vw, 2rem);
   margin-bottom: var(--spacing-sm);
   color: var(--gray-900);
 }
@@ -318,7 +337,7 @@
 }
 
 .mapPlaceholder {
-  height: 260px;
+  height: clamp(200px, 32vw, 260px);
   border-radius: var(--radius-lg);
   background: repeating-linear-gradient(
     45deg,
@@ -352,11 +371,28 @@
   .contactIntro {
     border-radius: var(--radius-xl);
   }
+
+  .storySection,
+  .valuesSection,
+  .contactSection,
+  .mapSection,
+  .heroSection {
+    padding: 0 var(--spacing-md);
+  }
+
+  .storySection {
+    text-align: center;
+  }
+
+  .timelineItem {
+    padding-left: var(--spacing-xl);
+  }
 }
 
 @media (max-width: 768px) {
   .heroSection {
     margin: var(--spacing-lg) auto;
+    gap: var(--spacing-xl);
   }
 
   .heroContent h1 {
@@ -369,6 +405,108 @@
 
   .mapCard {
     padding: var(--spacing-xl);
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contactForm button {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .valuesSection {
+    padding: var(--spacing-xl) clamp(1rem, 6vw, 2rem);
+  }
+
+  .valueCard {
+    padding: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .storySection {
+    gap: var(--spacing-xl);
+  }
+
+  .mapSection {
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+}
+
+@media (max-width: 560px) {
+  .container,
+  .heroSection,
+  .storySection,
+  .contactSection {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .heroContent h1 {
+    font-size: 2rem;
+  }
+
+  .heroContent p {
+    font-size: 1rem;
+  }
+
+  .highlightCard {
+    padding: var(--spacing-lg);
+  }
+
+  .valuesSection h2,
+  .storyContent h2,
+  .contactIntro h2,
+  .mapCard h2 {
+    font-size: 2rem;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .contactForm {
+    padding: clamp(1rem, 5vw, 1.5rem);
+  }
+
+  .contactForm input,
+  .contactForm select,
+  .contactForm textarea {
+    font-size: 0.95rem;
+  }
+
+  .timelineItem {
+    padding-left: var(--spacing-lg);
+  }
+
+  .timelineYear {
+    position: static;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .mapPlaceholder {
+    height: 220px;
+  }
+}
+
+@media (max-width: 420px) {
+  .heroCards,
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .mapSection,
+  .valuesSection,
+  .storySection,
+  .contactSection {
+    padding: 0 clamp(0.75rem, 6vw, 1.25rem);
+  }
+
+  .contactForm {
+    padding: var(--spacing-lg);
+  }
+
+  .contactForm button {
+    padding: var(--spacing-md);
   }
 }
 

@@ -74,12 +74,10 @@ export default function LectureViewer() {
     if (!enrolled || !currentLecture || !enrollment) return
 
     try {
-      const totalLectures = lectures.length
-      const completedCount = enrollment.completedLectures?.length || 0
-      const newProgress = Math.round(((completedCount + 1) / totalLectures) * 100)
+      // Backend will automatically calculate progress based on completed lectures / total lectures
+      await enrollmentAPI.updateProgress(enrollment._id, currentLecture._id)
 
-      await enrollmentAPI.updateProgress(enrollment._id, newProgress, currentLecture._id)
-
+      // Reload enrollment data to get updated progress
       const enrollmentData = await enrollmentAPI.checkEnrollment(courseId)
       setEnrollment(enrollmentData.enrollment)
 
@@ -172,9 +170,13 @@ export default function LectureViewer() {
             <div className={styles.videoInfo}>
               <h2>{currentLecture.title}</h2>
               {currentLecture.description && <p>{currentLecture.description}</p>}
-              <button onClick={markAsComplete} className={styles.completeBtn}>
-                Mark as Complete
-              </button>
+              {enrollment?.completedLectures?.includes(currentLecture._id) ? (
+                <div className={styles.completedTag}>✓ Completed</div>
+              ) : (
+                <button onClick={markAsComplete} className={styles.completeBtn}>
+                  Mark as Complete
+                </button>
+              )}
             </div>
 
             {resources.length > 0 && (

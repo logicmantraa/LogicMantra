@@ -17,7 +17,7 @@ export default function MyCourses() {
       setLoading(true)
       try {
         const [enrollmentData, courseData] = await Promise.all([
-          enrollmentAPI.getUserEnrollments(user._id),
+          enrollmentAPI.getMyEnrollments(),
           courseAPI.getCourses()
         ])
         setEnrollments(enrollmentData)

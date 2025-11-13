@@ -49,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         _id: data._id,
         name: data.name,
         email: data.email,
+        phoneNumber: data.phoneNumber,
         isAdmin: data.isAdmin,
       });
       return data;
@@ -58,15 +59,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, phoneNumber) => {
     try {
       setError(null);
-      const data = await authAPI.register({ name, email, password });
+      const data = await authAPI.register({ name, email, password, phoneNumber });
       localStorage.setItem('token', data.token);
       setUser({
         _id: data._id,
         name: data.name,
         email: data.email,
+        phoneNumber: data.phoneNumber,
         isAdmin: data.isAdmin,
       });
       return data;
@@ -93,6 +95,7 @@ export const AuthProvider = ({ children }) => {
         _id: data._id,
         name: data.name,
         email: data.email,
+        phoneNumber: data.phoneNumber,
         isAdmin: data.isAdmin,
       });
       return data;

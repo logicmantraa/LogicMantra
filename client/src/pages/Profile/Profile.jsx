@@ -5,12 +5,12 @@ import PageShell from '../../components/Layout/PageShell'
 import styles from './Profile.module.css'
 
 export default function Profile() {
-  const { user, logout } = useAuth()
+  const { user, logout, updateProfile: updateUserProfile, updatePassword: updateUserPassword } = useAuth()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [updating, setUpdating] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', bio: '', occupation: '', location: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '' })
   const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [passwordUpdating, setPasswordUpdating] = useState(false)
   const [message, setMessage] = useState('')
@@ -25,9 +25,7 @@ export default function Profile() {
         setFormData({
           name: data?.name || '',
           email: data?.email || '',
-          bio: data?.bio || '',
-          occupation: data?.occupation || '',
-          location: data?.location || ''
+          phoneNumber: data?.phoneNumber || ''
         })
       } catch (err) {
         setError(err.message || 'Failed to load profile')
@@ -52,7 +50,7 @@ export default function Profile() {
     setMessage('')
     setError('')
     try {
-      const updated = await authAPI.updateProfile(formData)
+      const updated = await updateUserProfile(formData)
       setProfile(updated)
       setEditing(false)
       setMessage('Profile updated successfully!')
@@ -74,10 +72,7 @@ export default function Profile() {
       return
     }
     try {
-      await authAPI.updatePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      })
+      await updateUserPassword(passwordData.currentPassword, passwordData.newPassword)
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
       setMessage('Password updated successfully!')
     } catch (err) {
@@ -127,18 +122,13 @@ export default function Profile() {
           </div>
           <h2>{profile?.name || 'Learner'}</h2>
           <p className={styles.email}>{profile?.email}</p>
+          {profile?.phoneNumber && (
+            <p className={styles.phoneNumber}>{profile.phoneNumber}</p>
+          )}
           <div className={styles.metaGrid}>
             <div>
               <span className={styles.metaLabel}>Role</span>
               <span className={styles.metaValue}>{user?.isAdmin ? 'Admin' : 'Student'}</span>
-            </div>
-            <div>
-              <span className={styles.metaLabel}>Occupation</span>
-              <span className={styles.metaValue}>{profile?.occupation || '—'}</span>
-            </div>
-            <div>
-              <span className={styles.metaLabel}>Location</span>
-              <span className={styles.metaValue}>{profile?.location || '—'}</span>
             </div>
           </div>
           <button className={styles.editBtn} onClick={() => setEditing((prev) => !prev)} type="button">
@@ -171,40 +161,24 @@ export default function Profile() {
                     id="email"
                     type="email"
                     value={formData.email}
-                    disabled
-                  />
-                </div>
-              </div>
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="occupation">Occupation</label>
-                  <input
-                    id="occupation"
-                    type="text"
-                    value={formData.occupation}
-                    onChange={(e) => handleInputChange('occupation', e.target.value)}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
                     disabled={!editing}
+                    required
                   />
-                </div>
-                <div className={styles.formGroup}>
-                  <label htmlFor="location">Location</label>
-                  <input
-                    id="location"
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    disabled={!editing}
-                  />
+                  {editing && (
+                    <span className={styles.fieldHint}>Note: Changing email will update your login credentials</span>
+                  )}
                 </div>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="bio">Bio</label>
-                <textarea
-                  id="bio"
-                  rows={4}
-                  value={formData.bio}
-                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                <label htmlFor="phoneNumber">Phone Number</label>
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                   disabled={!editing}
+                  placeholder="Enter your phone number (optional)"
                 />
               </div>
               <div className={styles.formActions}>

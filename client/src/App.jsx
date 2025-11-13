@@ -17,14 +17,29 @@ import AdminStoreItems from "./pages/Admin/StoreItems/AdminStoreItems";
 import AdminUsers from "./pages/Admin/Users/AdminUsers";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute/AdminRoute";
+import GuestRoute from "./components/GuestRoute/GuestRoute";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignupForm />} />
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <LoginForm />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <GuestRoute>
+              <SignupForm />
+            </GuestRoute>
+          }
+        />
         <Route path="/courses" element={<Courses />} />
         <Route path="/about" element={<About />} />
         <Route

@@ -118,6 +118,18 @@
   box-shadow: var(--shadow-lg);
 }
 
+.completedTag {
+  align-self: flex-start;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  background: rgba(16, 185, 129, 0.18);
+  color: var(--success);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: var(--shadow-sm);
+}
+
 .resources {
   background: white;
   padding: var(--spacing-2xl);

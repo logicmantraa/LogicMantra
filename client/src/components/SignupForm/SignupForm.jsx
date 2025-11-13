@@ -8,6 +8,7 @@ export default function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { register } = useAuth()
@@ -30,7 +31,7 @@ export default function SignupForm() {
     setLoading(true)
 
     try {
-      await register(name, email, password)
+      await register(name, email, password, phoneNumber)
       navigate('/')
     } catch (err) {
       setError(err.message || 'Failed to register')
@@ -57,6 +58,12 @@ export default function SignupForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+        />
+        <input
+          type="tel"
+          placeholder="Phone Number (Optional)"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
         />
         <input
           type="password"

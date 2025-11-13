@@ -14,9 +14,11 @@ export const getCourses = async (req, res) => {
     
     // Search by name/id
     if (search) {
+      const regex = { $regex: search, $options: 'i' };
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { title: regex },
+        { description: regex },
+        { instructor: regex }
       ];
       // If search is a valid ObjectId, also search by ID
       if (search.match(/^[0-9a-fA-F]{24}$/)) {

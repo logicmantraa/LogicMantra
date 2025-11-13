@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
   isAdmin: {
     type: Boolean,
     default: false
+  },
+  phoneNumber: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 

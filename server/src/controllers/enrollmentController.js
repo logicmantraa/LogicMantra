@@ -1,6 +1,7 @@
 import Enrollment from '../models/Enrollment.js';
 import Course from '../models/Course.js';
 import User from '../models/User.js';
+import Lecture from '../models/Lecture.js';
 
 // @desc    Enroll in a course
 // @route   POST /api/enrollments
@@ -50,7 +51,28 @@ export const getMyEnrollments = async (req, res) => {
       .populate('courseId')
       .sort({ enrolledAt: -1 });
     
-    res.json(enrollments);
+    // Calculate dynamic progress for each enrollment
+    const enrollmentsWithProgress = await Promise.all(
+      enrollments.map(async (enrollment) => {
+        const totalLectures = await Lecture.countDocuments({ courseId: enrollment.courseId._id });
+        const completedCount = enrollment.completedLectures.length;
+        
+        let progress = 0;
+        if (totalLectures > 0) {
+          progress = Math.round((completedCount / totalLectures) * 100);
+        }
+        
+        // Update stored progress if it differs
+        if (enrollment.progress !== progress) {
+          enrollment.progress = progress;
+          await enrollment.save();
+        }
+        
+        return enrollment;
+      })
+    );
+    
+    res.json(enrollmentsWithProgress);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -61,9 +83,9 @@ export const getMyEnrollments = async (req, res) => {
 // @access  Private
 export const updateProgress = async (req, res) => {
   try {
-    const { progress, lectureId } = req.body;
+    const { lectureId } = req.body;
     
-    const enrollment = await Enrollment.findById(req.params.id);
+    const enrollment = await Enrollment.findById(req.params.id).populate('courseId');
     
     if (!enrollment) {
       res.status(404);
@@ -76,13 +98,23 @@ export const updateProgress = async (req, res) => {
       throw new Error('Not authorized');
     }
     
-    if (progress !== undefined) {
-      enrollment.progress = Math.min(100, Math.max(0, progress));
-    }
-    
+    // Add lecture to completed lectures if not already completed
     if (lectureId && !enrollment.completedLectures.includes(lectureId)) {
       enrollment.completedLectures.push(lectureId);
     }
+    
+    // Calculate progress dynamically: (completed lectures / total lectures) * 100
+    const totalLectures = await Lecture.countDocuments({ courseId: enrollment.courseId._id });
+    const completedCount = enrollment.completedLectures.length;
+    
+    if (totalLectures > 0) {
+      enrollment.progress = Math.round((completedCount / totalLectures) * 100);
+    } else {
+      enrollment.progress = 0;
+    }
+    
+    // Ensure progress is between 0 and 100
+    enrollment.progress = Math.min(100, Math.max(0, enrollment.progress));
     
     await enrollment.save();
     
@@ -103,9 +135,28 @@ export const checkEnrollment = async (req, res) => {
       courseId: req.params.courseId
     });
     
+    if (enrollment) {
+      // Calculate dynamic progress: (completed lectures / total lectures) * 100
+      const totalLectures = await Lecture.countDocuments({ courseId: req.params.courseId });
+      const completedCount = enrollment.completedLectures.length;
+      
+      let progress = 0;
+      if (totalLectures > 0) {
+        progress = Math.round((completedCount / totalLectures) * 100);
+      }
+      
+      // Update stored progress if it differs
+      if (enrollment.progress !== progress) {
+        enrollment.progress = progress;
+        await enrollment.save();
+      }
+    }
+    
     res.json({ enrolled: !!enrollment, enrollment });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
 

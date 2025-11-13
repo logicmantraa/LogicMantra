@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { courseAPI, enrollmentAPI, ratingAPI } from '../../utils/api'
+import { courseAPI, enrollmentAPI, ratingAPI, lectureAPI, resourceAPI } from '../../utils/api'
 import { useAuth } from '../../context/AuthContext'
 import PageShell from '../../components/Layout/PageShell'
 import Rating from '../../components/Rating/Rating'
@@ -16,6 +16,25 @@ export default function CourseDetail() {
   const [enrolled, setEnrolled] = useState(false)
   const [loading, setLoading] = useState(true)
   const [enrolling, setEnrolling] = useState(false)
+  const [showLectureModal, setShowLectureModal] = useState(false)
+  const [showResourceModal, setShowResourceModal] = useState(false)
+  const [savingLecture, setSavingLecture] = useState(false)
+  const [savingResource, setSavingResource] = useState(false)
+  const [lectureForm, setLectureForm] = useState({
+    title: '',
+    description: '',
+    videoUrl: '',
+    order: 1,
+    duration: 0,
+    isPreview: false
+  })
+  const [resourceForm, setResourceForm] = useState({
+    name: '',
+    type: 'notes',
+    fileUrl: '',
+    fileType: 'pdf',
+    lectureId: ''
+  })
 
   useEffect(() => {
     loadCourseData()
@@ -71,6 +90,66 @@ export default function CourseDetail() {
     loadCourseData()
   }
 
+  const openLectureModal = () => {
+    setLectureForm({
+      title: '',
+      description: '',
+      videoUrl: '',
+      order: lectures.length + 1,
+      duration: 0,
+      isPreview: false
+    })
+    setShowLectureModal(true)
+  }
+
+  const openResourceModal = () => {
+    setResourceForm({
+      name: '',
+      type: 'notes',
+      fileUrl: '',
+      fileType: 'pdf',
+      lectureId: ''
+    })
+    setShowResourceModal(true)
+  }
+
+  const submitLecture = async (event) => {
+    event.preventDefault()
+    setSavingLecture(true)
+    try {
+      await lectureAPI.createLecture({
+        ...lectureForm,
+        courseId: id,
+        order: Number(lectureForm.order) || lectures.length + 1,
+        duration: Number(lectureForm.duration) || 0
+      })
+      setShowLectureModal(false)
+      await loadCourseData()
+    } catch (err) {
+      alert(err.message || 'Failed to create lecture')
+    } finally {
+      setSavingLecture(false)
+    }
+  }
+
+  const submitResource = async (event) => {
+    event.preventDefault()
+    setSavingResource(true)
+    try {
+      await resourceAPI.createResource({
+        ...resourceForm,
+        courseId: id,
+        lectureId: resourceForm.lectureId || null
+      })
+      setShowResourceModal(false)
+      await loadCourseData()
+    } catch (err) {
+      alert(err.message || 'Failed to create resource')
+    } finally {
+      setSavingResource(false)
+    }
+  }
+
   if (loading) {
     return (
       <PageShell contentClassName={styles.container}>
@@ -118,7 +197,14 @@ export default function CourseDetail() {
           </div>
 
           <div className={styles.section}>
-            <h2>Lectures ({lectures.length})</h2>
+            <div className={styles.sectionHeader}>
+              <h2>Lectures ({lectures.length})</h2>
+              {user?.isAdmin && (
+                <button className={styles.sectionAction} onClick={openLectureModal} type="button">
+                  + Add Lecture
+                </button>
+              )}
+            </div>
             {lectures.length === 0 ? (
               <p>No lectures available</p>
             ) : (
@@ -146,7 +232,14 @@ export default function CourseDetail() {
           </div>
 
           <div className={styles.section}>
-            <h2>Resources</h2>
+            <div className={styles.sectionHeader}>
+              <h2>Resources</h2>
+              {user?.isAdmin && (
+                <button className={styles.sectionAction} onClick={openResourceModal} type="button">
+                  + Add Resource
+                </button>
+              )}
+            </div>
             {resources.length === 0 ? (
               <p>No resources available</p>
             ) : (
@@ -231,6 +324,156 @@ export default function CourseDetail() {
           </div>
         </aside>
       </div>
+
+      {showLectureModal && (
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setShowLectureModal(false)}>
+          <div className={styles.modalPanel}>
+            <div className={styles.modalHeader}>
+              <h2>Add Lecture</h2>
+              <button onClick={() => setShowLectureModal(false)} type="button">×</button>
+            </div>
+            <form className={styles.modalForm} onSubmit={submitLecture}>
+              <label>
+                Title
+                <input
+                  type="text"
+                  value={lectureForm.title}
+                  onChange={(e) => setLectureForm((prev) => ({ ...prev, title: e.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                Description
+                <textarea
+                  rows={3}
+                  value={lectureForm.description}
+                  onChange={(e) => setLectureForm((prev) => ({ ...prev, description: e.target.value }))}
+                />
+              </label>
+              <label>
+                Video URL
+                <input
+                  type="url"
+                  value={lectureForm.videoUrl}
+                  onChange={(e) => setLectureForm((prev) => ({ ...prev, videoUrl: e.target.value }))}
+                  required
+                />
+              </label>
+              <div className={styles.formRow}>
+                <label>
+                  Order
+                  <input
+                    type="number"
+                    min="1"
+                    value={lectureForm.order}
+                    onChange={(e) => setLectureForm((prev) => ({ ...prev, order: e.target.value }))}
+                    required
+                  />
+                </label>
+                <label>
+                  Duration (min)
+                  <input
+                    type="number"
+                    min="0"
+                    value={lectureForm.duration}
+                    onChange={(e) => setLectureForm((prev) => ({ ...prev, duration: e.target.value }))}
+                  />
+                </label>
+              </div>
+              <label className={styles.checkboxField}>
+                <input
+                  type="checkbox"
+                  checked={lectureForm.isPreview}
+                  onChange={(e) => setLectureForm((prev) => ({ ...prev, isPreview: e.target.checked }))}
+                />
+                Mark as preview
+              </label>
+              <div className={styles.modalActions}>
+                <button type="button" onClick={() => setShowLectureModal(false)} className={styles.cancelBtn}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.saveBtn} disabled={savingLecture}>
+                  {savingLecture ? 'Saving…' : 'Save Lecture'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showResourceModal && (
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setShowResourceModal(false)}>
+          <div className={styles.modalPanel}>
+            <div className={styles.modalHeader}>
+              <h2>Add Resource</h2>
+              <button onClick={() => setShowResourceModal(false)} type="button">×</button>
+            </div>
+            <form className={styles.modalForm} onSubmit={submitResource}>
+              <label>
+                Name
+                <input
+                  type="text"
+                  value={resourceForm.name}
+                  onChange={(e) => setResourceForm((prev) => ({ ...prev, name: e.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                Resource Type
+                <select
+                  value={resourceForm.type}
+                  onChange={(e) => setResourceForm((prev) => ({ ...prev, type: e.target.value }))}
+                >
+                  <option value="notes">Notes</option>
+                  <option value="practice">Practice</option>
+                </select>
+              </label>
+              <label>
+                File URL
+                <input
+                  type="url"
+                  value={resourceForm.fileUrl}
+                  onChange={(e) => setResourceForm((prev) => ({ ...prev, fileUrl: e.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                File Type (optional)
+                <input
+                  type="text"
+                  value={resourceForm.fileType}
+                  onChange={(e) => setResourceForm((prev) => ({ ...prev, fileType: e.target.value }))}
+                  placeholder="pdf, docx, etc"
+                />
+              </label>
+              <label>
+                Attach to Lecture (optional)
+                <select
+                  value={resourceForm.lectureId}
+                  onChange={(e) => setResourceForm((prev) => ({ ...prev, lectureId: e.target.value }))}
+                >
+                  <option value="">No lecture linked</option>
+                  {lectures.map((lecture) => (
+                    <option value={lecture._id} key={lecture._id}>
+                      {lecture.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className={styles.modalActions}>
+                <button type="button" onClick={() => setShowResourceModal(false)} className={styles.cancelBtn}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.saveBtn} disabled={savingResource}>
+                  {savingResource ? 'Saving…' : 'Save Resource'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.addSpace}></div>
     </PageShell>
   )
 }
