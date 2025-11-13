@@ -31,7 +31,6 @@ export default function CourseDetail() {
     name: '',
     type: 'notes',
     fileUrl: '',
-    fileType: 'pdf',
     lectureId: ''
   })
 
@@ -105,7 +104,6 @@ export default function CourseDetail() {
       name: '',
       type: 'notes',
       fileUrl: '',
-      fileType: 'pdf',
       lectureId: ''
     })
     setShowResourceModal(true)
@@ -421,15 +419,6 @@ export default function CourseDetail() {
                   value={resourceForm.fileUrl}
                   onChange={(e) => setResourceForm((prev) => ({ ...prev, fileUrl: e.target.value }))}
                   required
-                />
-              </label>
-              <label>
-                File Type (optional)
-                <input
-                  type="text"
-                  value={resourceForm.fileType}
-                  onChange={(e) => setResourceForm((prev) => ({ ...prev, fileType: e.target.value }))}
-                  placeholder="pdf, docx, etc"
                 />
               </label>
               <label>
