@@ -1,0 +1,158 @@
+import PageShell from '../../components/Layout/PageShell'
+import styles from './About.module.css'
+
+const values = [
+  {
+    title: 'Learner First',
+    description: 'We build every feature with the learner experience front and centre.'
+  },
+  {
+    title: 'Outcome Driven',
+    description: 'Courses designed around real-world projects and measurable growth.'
+  },
+  {
+    title: 'Community Powered',
+    description: 'Connect with mentors, peers, and alumni for lifelong learning.'
+  }
+]
+
+const contactMetrics = [
+  { value: '24/7', label: 'Learner Support' },
+  { value: '3 Hrs', label: 'Average Response Time' },
+  { value: '40+', label: 'Countries Learners Come From' }
+]
+
+export default function About() {
+  return (
+    <PageShell contentClassName={styles.page}>
+      <section className={styles.heroSection}>
+        <div className={styles.heroContent}>
+          <p className={styles.kicker}>About Logic Mantraa</p>
+          <h1>Empowering Learners To Shape The Future</h1>
+          <p>
+            We are a team of educators, engineers, and storytellers dedicated to creating learning experiences
+            that are immersive, accessible, and career defining. From our humble beginnings to a thriving global
+            community, Logic Mantraa has been built on the belief that knowledge should be borderless.
+          </p>
+        </div>
+        <div className={styles.heroCards}>
+          <div className={styles.highlightCard}>
+            <span className={styles.highlightNumber}>50K+</span>
+            <span className={styles.highlightLabel}>Lessons Streamed</span>
+          </div>
+          <div className={styles.highlightCard}>
+            <span className={styles.highlightNumber}>120</span>
+            <span className={styles.highlightLabel}>Partner Institutions</span>
+          </div>
+          <div className={styles.highlightCard}>
+            <span className={styles.highlightNumber}>4.8★</span>
+            <span className={styles.highlightLabel}>Learner Rating</span>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.valuesSection}>
+        <h2>What We Stand For</h2>
+        <div className={styles.valuesGrid}>
+          {values.map((value) => (
+            <article key={value.title} className={styles.valueCard}>
+              <h3>{value.title}</h3>
+              <p>{value.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.storySection}>
+        <div className={styles.storyContent}>
+          <h2>Our Story</h2>
+          <p>
+            Logic Mantraa started in 2018 as a study circle helping college students decode complex concepts through
+            storytelling and live workshops. Today we have evolved into a full-fledged learning ecosystem with
+            immersive courses, collaborative projects, and mentorship-driven bootcamps.
+          </p>
+          <p>
+            Every course on Logic Mantraa is crafted with industry mentors, combining real-world problem solving with
+            the consistent support of our learning coaches. We continue to experiment with new mediums – interactive
+            sandboxes, AI assistants, and cohort-based challenges – to keep our learners ahead of the curve.
+          </p>
+        </div>
+        <div className={styles.timeline}>
+          <div className={styles.timelineItem}>
+            <span className={styles.timelineYear}>2018</span>
+            <p>Founded with 30 learners and weekend knowledge sessions.</p>
+          </div>
+          <div className={styles.timelineItem}>
+            <span className={styles.timelineYear}>2020</span>
+            <p>Launched our digital platform, welcoming remote learners worldwide.</p>
+          </div>
+          <div className={styles.timelineItem}>
+            <span className={styles.timelineYear}>2023</span>
+            <p>Introduced AI-assisted practice labs and mentor-led cohorts.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.contactSection}>
+        <div className={styles.contactIntro}>
+          <h2>Let’s Build Something Extraordinary</h2>
+          <p>
+            Whether you are a learner, educator, or organisation, we’d love to hear from you. Drop us a note and
+            our team will reach out within a few hours.
+          </p>
+          <div className={styles.metrics}>
+            {contactMetrics.map((metric) => (
+              <div key={metric.label} className={styles.metric}>
+                <span className={styles.metricValue}>{metric.value}</span>
+                <span className={styles.metricLabel}>{metric.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className={styles.adSpace}>
+            Dedicated ad slot reserved for future partnerships & Google Ads.
+          </div>
+        </div>
+
+        <form className={styles.contactForm}>
+          <div className={styles.formGrid}>
+            <label>
+              Full Name
+              <input type="text" placeholder="Your name" required />
+            </label>
+            <label>
+              Email
+              <input type="email" placeholder="you@example.com" required />
+            </label>
+          </div>
+          <label>
+            Select Intent
+            <select defaultValue="learn">
+              <option value="learn">I want to learn</option>
+              <option value="teach">I want to teach</option>
+              <option value="partner">We want to partner</option>
+            </select>
+          </label>
+          <label>
+            Your Message
+            <textarea rows={5} placeholder="Tell us how we can help…" />
+          </label>
+          <button type="submit">Send Message</button>
+        </form>
+      </section>
+
+      <section className={styles.mapSection}>
+        <div className={styles.mapCard}>
+          <h2>Where You’ll Find Us</h2>
+          <p>
+            91/4 Knowledge Park, Bengaluru, India · <a href="mailto:hello@logicmantraa.com">hello@logicmantraa.com</a>
+          </p>
+          <div className={styles.mapPlaceholder}>
+            Interactive map & campus walkthrough coming soon.
+          </div>
+        </div>
+      </section>
+    </PageShell>
+  )
+}
+
+

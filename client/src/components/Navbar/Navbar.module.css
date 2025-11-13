@@ -1,0 +1,341 @@
+.navbar {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 74px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  transition: transform var(--transition-fast);
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.logo:hover {
+  transform: scale(1.03);
+}
+
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+}
+
+.logoMark img {
+  height: 48px;
+  width: auto;
+  display: block;
+}
+
+.logoText {
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.navlinks {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+
+.navlinks a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.navlinks a::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: white;
+  transition: all var(--transition-fast);
+  transform: translateX(-50%);
+}
+
+.navlinks a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.navlinks a:hover::before {
+  width: 80%;
+}
+
+.logoutBtn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(10px);
+}
+
+.logoutBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.menuToggle {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.menuToggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: white;
+  border-radius: var(--radius-full);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.menuToggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.menuToggle.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menuToggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menuToggle.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.authGroup {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.signupBtn {
+  background: white;
+  color: var(--primary-600);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius);
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+}
+
+.signupBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.adminMenu {
+  position: relative;
+}
+
+.adminToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.adminToggle:hover,
+.adminToggle.openToggle {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.adminDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xl);
+  padding: var(--spacing-sm) 0;
+  min-width: 180px;
+  display: none;
+  flex-direction: column;
+  z-index: 1300;
+  animation: scaleIn var(--transition-fast);
+}
+
+.adminDropdown a {
+  color: var(--gray-700);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: 0;
+}
+
+.adminDropdown a:hover {
+  background: var(--primary-50);
+  color: var(--primary-600);
+  transform: none;
+}
+
+.adminDropdown a::before {
+  display: none;
+}
+
+.adminDropdown.show {
+  display: flex;
+}
+
+.mobileOverlay {
+  position: fixed;
+  top: 74px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 74px);
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 1100;
+}
+
+@media (max-width: 1180px) {
+  .menuToggle {
+    display: flex;
+  }
+
+  .logoText {
+    font-size: 0.95rem;
+  }
+
+  .navlinks {
+    position: fixed;
+    top: 74px;
+    right: 16px;
+    width: min(360px, 88%);
+    height: calc(100vh - 90px);
+    flex-direction: column;
+    align-items: flex-start;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 122, 26, 0.95) 0%,
+      rgba(255, 31, 148, 0.92) 55%,
+      rgba(115, 14, 67, 0.94) 100%
+    );
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    transform: translateX(120%);
+    gap: var(--spacing-lg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    z-index: 1201;
+  }
+
+  .navlinks.open {
+    transform: translateX(0);
+  }
+
+  .navlinks a {
+    font-size: 1.1rem;
+    width: 100%;
+  }
+
+  .authGroup,
+  .adminMenu,
+  .logoutBtn,
+  .signupBtn {
+    width: 100%;
+  }
+
+  .adminDropdown {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.15);
+    margin-top: var(--spacing-sm);
+  }
+
+  .adminDropdown a {
+    color: white;
+    padding-left: 0;
+  }
+
+  .adminDropdown a:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+  }
+
+  .logoutBtn,
+  .signupBtn {
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .logoMark {
+    padding: 4px;
+  }
+
+  .logoMark img {
+    height: 42px;
+  }
+
+  .logoText {
+    display: none;
+  }
+
+  .navlinks {
+    right: 12px;
+    width: min(340px, 92%);
+    padding: var(--spacing-2xl) var(--spacing-lg);
+  }
+}

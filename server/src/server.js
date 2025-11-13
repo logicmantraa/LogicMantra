@@ -6,6 +6,13 @@ import mongoose from 'mongoose';
 // Import routes
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
+import courseRoutes from './routes/course.js';
+import lectureRoutes from './routes/lecture.js';
+import resourceRoutes from './routes/resource.js';
+import enrollmentRoutes from './routes/enrollment.js';
+import ratingRoutes from './routes/rating.js';
+import storeRoutes from './routes/store.js';
+import adminRoutes from './routes/admin.js';
 
 // Import middleware
 import { errorHandler, notFound } from './middleware/errorHandler.js';
@@ -25,6 +32,13 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/lectures', lectureRoutes);
+app.use('/api/resources', resourceRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/ratings', ratingRoutes);
+app.use('/api/store', storeRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Base route
 app.get('/', (req, res) => {

@@ -1,0 +1,348 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+  animation: fadeIn var(--transition-base);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-xl);
+  align-items: center;
+  background: white;
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.8rem;
+  color: var(--primary-600);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: var(--spacing-sm);
+  color: var(--gray-900);
+}
+
+.subtitle {
+  color: var(--gray-600);
+  line-height: 1.7;
+  max-width: 620px;
+}
+
+.progressBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  color: white;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.progressLabel {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  opacity: 0.85;
+}
+
+.progressValue {
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.adPlaceholder {
+  border: 2px dashed rgba(255, 122, 26, 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  background: rgba(255, 122, 26, 0.08);
+  color: var(--primary-600);
+  text-align: center;
+  font-weight: 600;
+}
+
+.enrollmentsSection,
+.recommendations {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: var(--gray-900);
+}
+
+.sectionLink {
+  color: var(--primary-600);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sectionLink:hover {
+  text-decoration: underline;
+}
+
+.loading,
+.emptyState,
+.noRecommendations {
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 1.05rem;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.enrollmentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.enrollmentCard {
+  background: linear-gradient(135deg, rgba(255, 244, 230, 0.6), rgba(255, 206, 232, 0.5));
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.enrollmentCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 122, 26, 0.15), rgba(255, 31, 148, 0.1));
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.enrollmentCard:hover::after {
+  opacity: 1;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.courseInfo h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.courseInfo p {
+  margin: var(--spacing-xs) 0 0;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+.viewCourse {
+  text-decoration: none;
+  color: white;
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  padding: var(--spacing-xs) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: 1;
+}
+
+.courseDescription {
+  color: var(--gray-600);
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.progressBar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--gray-700);
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.recommendationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.recommendationCard {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.recommendationCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-xl);
+}
+
+.recommendationMeta {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.level,
+.category {
+  background: var(--primary-50);
+  color: var(--primary-600);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.category {
+  background: var(--secondary-50);
+  color: var(--secondary-600);
+}
+
+.recommendationCard h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--gray-900);
+}
+
+.recommendationCard p {
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+.recommendationFooter {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+.secondaryBtn {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--primary-600);
+  padding: var(--spacing-xs) var(--spacing-lg);
+  border-radius: var(--radius-full);
+  background: rgba(255, 122, 26, 0.12);
+  transition: all var(--transition-fast);
+}
+
+.secondaryBtn:hover {
+  background: rgba(255, 122, 26, 0.22);
+}
+
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progressBadge {
+    align-self: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.4rem;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progressMeta {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .progressBadge {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

@@ -1,0 +1,78 @@
+.frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--content-max)) minmax(0, 1fr);
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  position: relative;
+}
+
+.frameCompact {
+  grid-template-columns: minmax(0, var(--content-max));
+  justify-content: center;
+}
+
+.content {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  position: relative;
+}
+
+.adRail {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.adPlaceholder {
+  width: 190px;
+  min-height: 600px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed rgba(255, 122, 26, 0.35);
+  background: rgba(255, 122, 26, 0.08);
+  color: var(--primary-600);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: var(--spacing-lg) var(--spacing-sm);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.2em;
+  position: sticky;
+  top: 110px;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 1400px) {
+  .adPlaceholder {
+    width: 150px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .frame {
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, var(--content-max));
+  }
+
+  .adPlaceholder {
+    width: 120px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .frame {
+    grid-template-columns: 1fr;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .adRail {
+    display: none;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+}

@@ -15,17 +15,20 @@ export const protect = async (req, res, next) => {
       // Get user from the token
       req.user = await User.findById(decoded.id).select('-password');
 
+      if (!req.user) {
+        res.status(401);
+        return res.json({ message: 'User not found' });
+      }
+
       next();
     } catch (error) {
       console.error(error);
       res.status(401);
-      throw new Error('Not authorized, token failed');
+      return res.json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
+  } else {
     res.status(401);
-    throw new Error('Not authorized, no token');
+    return res.json({ message: 'Not authorized, no token' });
   }
 };
 
@@ -34,6 +37,6 @@ export const admin = (req, res, next) => {
     next();
   } else {
     res.status(401);
-    throw new Error('Not authorized as an admin');
+    return res.json({ message: 'Not authorized as an admin' });
   }
 };
