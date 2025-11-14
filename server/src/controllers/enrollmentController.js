@@ -2,6 +2,8 @@ import Enrollment from '../models/Enrollment.js';
 import Course from '../models/Course.js';
 import User from '../models/User.js';
 import Lecture from '../models/Lecture.js';
+import { sendEmail } from '../config/email.js';
+import { enrollmentConfirmationEmailTemplate } from '../utils/emailTemplates.js';
 
 // @desc    Enroll in a course
 // @route   POST /api/enrollments
@@ -34,6 +36,16 @@ export const enrollInCourse = async (req, res) => {
     // Update course enrollment count
     course.enrolledCount += 1;
     await course.save();
+    
+    // Send enrollment confirmation email (async, don't wait for it)
+    const user = await User.findById(userId);
+    if (user && user.email) {
+      sendEmail({
+        to: user.email,
+        subject: `Enrollment Confirmed: ${course.title}`,
+        html: enrollmentConfirmationEmailTemplate(user.name, course.title)
+      }).catch(err => console.error('Failed to send enrollment confirmation email:', err));
+    }
     
     res.status(201).json(enrollment);
   } catch (error) {

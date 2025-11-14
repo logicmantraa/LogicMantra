@@ -146,6 +146,15 @@ NODE_ENV=development
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/logicmantraa
 JWT_SECRET=your_super_secret_jwt_key_here
+
+# Email Configuration (Optional - for notifications)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+EMAIL_FROM_NAME=Logic Mantraa
+FRONTEND_URL=http://localhost:5173
 ```
 
 2. Update `MONGO_URI` with your MongoDB connection string:

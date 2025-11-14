@@ -1,4 +1,10 @@
 import Contact from '../models/Contact.js';
+import { sendEmail } from '../config/email.js';
+import { 
+  contactConfirmationEmailTemplate, 
+  contactAdminNotificationTemplate 
+} from '../utils/emailTemplates.js';
+import User from '../models/User.js';
 
 // @desc    Submit contact form
 // @route   POST /api/contact
@@ -31,6 +37,27 @@ export const submitContact = async (req, res) => {
       message,
       userId
     });
+
+    // Send confirmation email to user (async, don't wait for it)
+    sendEmail({
+      to: email,
+      subject: 'Thank You for Contacting Logic Mantraa',
+      html: contactConfirmationEmailTemplate(name, intent, message)
+    }).catch(err => console.error('Failed to send contact confirmation email:', err));
+
+    // Send notification email to admin users (async, don't wait for it)
+    User.find({ isAdmin: true })
+      .then(admins => {
+        const adminEmails = admins.map(admin => admin.email).filter(Boolean);
+        if (adminEmails.length > 0) {
+          return sendEmail({
+            to: adminEmails.join(','),
+            subject: `New Contact Submission: ${intent}`,
+            html: contactAdminNotificationTemplate(contact)
+          });
+        }
+      })
+      .catch(err => console.error('Failed to send admin notification email:', err));
 
     res.status(201).json({
       message: 'Thank you for contacting us! We will get back to you soon.',

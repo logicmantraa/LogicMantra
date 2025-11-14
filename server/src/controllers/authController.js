@@ -1,5 +1,7 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import { sendEmail } from '../config/email.js';
+import { welcomeEmailTemplate } from '../utils/emailTemplates.js';
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -23,6 +25,13 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Send welcome email (async, don't wait for it)
+      sendEmail({
+        to: user.email,
+        subject: 'Welcome to Logic Mantraa! 🎉',
+        html: welcomeEmailTemplate(user.name)
+      }).catch(err => console.error('Failed to send welcome email:', err));
+
       res.status(201).json({
         _id: user._id,
         name: user.name,
