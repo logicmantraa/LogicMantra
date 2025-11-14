@@ -12,7 +12,7 @@
   gap: var(--spacing-xl);
   align-items: center;
   background: white;
-  padding: var(--spacing-2xl);
+  padding: clamp(1.25rem, 4vw, var(--spacing-2xl));
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
 }
@@ -20,23 +20,25 @@
 .kicker {
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1.4vw, 0.8rem);
   color: var(--primary-600);
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
 }
 
 .title {
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
   margin-bottom: var(--spacing-sm);
   color: var(--gray-900);
+  line-height: 1.1;
 }
 
 .subtitle {
   color: var(--gray-600);
   line-height: 1.7;
   max-width: 620px;
+  font-size: clamp(0.95rem, 2vw, 1rem);
 }
 
 .progressBadge {
@@ -45,38 +47,41 @@
   align-items: flex-end;
   background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
   color: white;
-  padding: var(--spacing-xl);
+  padding: clamp(1rem, 3vw, var(--spacing-xl));
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 .progressLabel {
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1.5vw, 0.8rem);
   letter-spacing: 0.2em;
   opacity: 0.85;
 }
 
 .progressValue {
-  font-size: 2.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   font-weight: 800;
 }
 
 .adPlaceholder {
   border: 2px dashed rgba(255, 122, 26, 0.4);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-xl);
+  padding: clamp(1rem, 3vw, var(--spacing-xl));
   background: rgba(255, 122, 26, 0.08);
   color: var(--primary-600);
   text-align: center;
   font-weight: 600;
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 .enrollmentsSection,
 .recommendations {
   background: white;
   border-radius: var(--radius-xl);
-  padding: var(--spacing-2xl);
+  padding: clamp(1.25rem, 4vw, var(--spacing-2xl));
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
@@ -88,11 +93,12 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-lg);
+  flex-wrap: wrap;
 }
 
 .sectionHeader h2 {
   margin: 0;
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   color: var(--gray-900);
 }
 
@@ -134,14 +140,14 @@
 
 .enrollmentGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: var(--spacing-xl);
 }
 
 .enrollmentCard {
   background: linear-gradient(135deg, rgba(255, 244, 230, 0.6), rgba(255, 206, 232, 0.5));
   border-radius: var(--radius-xl);
-  padding: var(--spacing-xl);
+  padding: clamp(1rem, 3vw, var(--spacing-xl));
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
@@ -166,35 +172,46 @@
 .cardHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--spacing-lg);
   position: relative;
   z-index: 1;
+  flex-wrap: wrap;
+}
+
+.courseInfo {
+  flex: 1;
+  min-width: 0;
 }
 
 .courseInfo h3 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
   font-weight: 700;
   color: var(--gray-900);
+  word-wrap: break-word;
 }
 
 .courseInfo p {
   margin: var(--spacing-xs) 0 0;
   color: var(--gray-500);
   font-weight: 500;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
 .viewCourse {
   text-decoration: none;
   color: white;
   background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
-  padding: var(--spacing-xs) var(--spacing-lg);
+  padding: clamp(0.5rem, 1.5vw, var(--spacing-xs)) clamp(0.75rem, 2.5vw, var(--spacing-lg));
   border-radius: var(--radius-full);
   font-weight: 600;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
   box-shadow: var(--shadow-md);
   position: relative;
   z-index: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .courseDescription {
@@ -202,6 +219,7 @@
   line-height: 1.6;
   position: relative;
   z-index: 1;
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 .progressBar {
@@ -227,18 +245,26 @@
   font-weight: 600;
   position: relative;
   z-index: 1;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.progressMeta span {
+  flex: 1;
+  min-width: fit-content;
 }
 
 .recommendationGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: var(--spacing-xl);
 }
 
 .recommendationCard {
   background: white;
   border-radius: var(--radius-xl);
-  padding: var(--spacing-xl);
+  padding: clamp(1rem, 3vw, var(--spacing-xl));
   box-shadow: var(--shadow);
   border: 1px solid rgba(255, 255, 255, 0.6);
   display: flex;
@@ -274,13 +300,14 @@
 
 .recommendationCard h3 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
   color: var(--gray-900);
 }
 
 .recommendationCard p {
   color: var(--gray-600);
   line-height: 1.6;
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 .recommendationFooter {
@@ -289,10 +316,11 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-lg);
+  flex-wrap: wrap;
 }
 
 .price {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
   font-weight: 700;
   color: var(--primary-600);
 }
@@ -301,10 +329,12 @@
   text-decoration: none;
   font-weight: 600;
   color: var(--primary-600);
-  padding: var(--spacing-xs) var(--spacing-lg);
+  padding: clamp(0.5rem, 1.5vw, var(--spacing-xs)) clamp(0.75rem, 2.5vw, var(--spacing-lg));
   border-radius: var(--radius-full);
   background: rgba(255, 122, 26, 0.12);
   transition: all var(--transition-fast);
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  white-space: nowrap;
 }
 
 .secondaryBtn:hover {
@@ -326,23 +356,81 @@
 }
 
 @media (max-width: 768px) {
-  .title {
-    font-size: 2.4rem;
+  .container {
+    gap: var(--spacing-xl);
+  }
+
+  .header {
+    padding: var(--spacing-lg);
   }
 
   .sectionHeader {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .sectionHeader h2 {
+    width: 100%;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .viewCourse {
+    align-self: stretch;
+    text-align: center;
   }
 
   .progressMeta {
     flex-direction: column;
     gap: var(--spacing-xs);
+    align-items: flex-start;
   }
 
   .progressBadge {
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
+  }
+
+  .enrollmentGrid,
+  .recommendationGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .recommendationFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .secondaryBtn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    gap: var(--spacing-lg);
+  }
+
+  .header {
+    padding: var(--spacing-md);
+  }
+
+  .enrollmentsSection,
+  .recommendations {
+    padding: var(--spacing-lg);
+  }
+
+  .enrollmentCard,
+  .recommendationCard {
+    padding: var(--spacing-md);
   }
 }
 
