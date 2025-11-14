@@ -184,5 +184,25 @@ export const adminAPI = {
   getDashboardStats: () => apiRequest('/admin/dashboard'),
 };
 
+// Contact API
+export const contactAPI = {
+  submitContact: (contactData) => apiRequest('/contact', {
+    method: 'POST',
+    body: contactData,
+  }),
+  getContacts: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/contact${queryString ? `?${queryString}` : ''}`);
+  },
+  getContactById: (id) => apiRequest(`/contact/${id}`),
+  updateContactStatus: (id, status) => apiRequest(`/contact/${id}`, {
+    method: 'PUT',
+    body: { status },
+  }),
+  deleteContact: (id) => apiRequest(`/contact/${id}`, {
+    method: 'DELETE',
+  }),
+};
+
 export default apiRequest;
 

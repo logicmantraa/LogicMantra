@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import PageShell from '../../components/Layout/PageShell'
+import { contactAPI } from '../../utils/api'
 import styles from './About.module.css'
 
 const values = [
@@ -23,6 +25,44 @@ const contactMetrics = [
 ]
 
 export default function About() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    intent: 'learn',
+    message: ''
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null)
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
+    setSubmitStatus(null)
+
+    try {
+      await contactAPI.submitContact(formData)
+      setSubmitStatus({ type: 'success', message: 'Thank you for contacting us! We will get back to you soon.' })
+      setFormData({
+        name: '',
+        email: '',
+        intent: 'learn',
+        message: ''
+      })
+    } catch (err) {
+      setSubmitStatus({ type: 'error', message: err.message || 'Failed to send message. Please try again.' })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <PageShell contentClassName={styles.page}>
       <section className={styles.heroSection}>
@@ -113,20 +153,46 @@ export default function About() {
           </div>
         </div>
 
-        <form className={styles.contactForm}>
+        <form className={styles.contactForm} onSubmit={handleSubmit}>
+          {submitStatus && (
+            <div className={submitStatus.type === 'success' ? styles.successMessage : styles.errorMessage}>
+              {submitStatus.message}
+            </div>
+          )}
           <div className={styles.formGrid}>
             <label>
               Full Name
-              <input type="text" placeholder="Your name" required />
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Your name"
+                required
+                disabled={submitting}
+              />
             </label>
             <label>
               Email
-              <input type="email" placeholder="you@example.com" required />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="you@example.com"
+                required
+                disabled={submitting}
+              />
             </label>
           </div>
           <label>
             Select Intent
-            <select defaultValue="learn">
+            <select
+              name="intent"
+              value={formData.intent}
+              onChange={handleInputChange}
+              disabled={submitting}
+            >
               <option value="learn">I want to learn</option>
               <option value="teach">I want to teach</option>
               <option value="partner">We want to partner</option>
@@ -134,9 +200,19 @@ export default function About() {
           </label>
           <label>
             Your Message
-            <textarea rows={5} placeholder="Tell us how we can help…" />
+            <textarea
+              name="message"
+              value={formData.message}
+              onChange={handleInputChange}
+              rows={5}
+              placeholder="Tell us how we can help…"
+              required
+              disabled={submitting}
+            />
           </label>
-          <button type="submit">Send Message</button>
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Sending...' : 'Send Message'}
+          </button>
         </form>
       </section>
 

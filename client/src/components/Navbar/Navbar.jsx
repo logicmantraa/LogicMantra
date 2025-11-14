@@ -123,6 +123,9 @@ export default function Navbar() {
                     <Link to="/admin/users" onClick={closeMenus}>
                       Users
                     </Link>
+                    <Link to="/admin/contacts" onClick={closeMenus}>
+                      Contacts
+                    </Link>
                   </div>
                 </div>
               )}

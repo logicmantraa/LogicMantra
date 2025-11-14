@@ -3,6 +3,7 @@ import SignupForm from "./components/SignupForm/SignupForm";
 import LoginForm from "./components/LoginForm/LoginForm";
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
+import Contact from "./pages/Contact/Contact";
 import Courses from "./pages/Courses/Courses";
 import CourseDetail from "./pages/CourseDetail/CourseDetail";
 import LectureViewer from "./pages/LectureViewer/LectureViewer";
@@ -15,6 +16,7 @@ import AdminLectures from "./pages/Admin/Lectures/AdminLectures";
 import AdminResources from "./pages/Admin/Resources/AdminResources";
 import AdminStoreItems from "./pages/Admin/StoreItems/AdminStoreItems";
 import AdminUsers from "./pages/Admin/Users/AdminUsers";
+import AdminContacts from "./pages/Admin/Contacts/AdminContacts";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute/AdminRoute";
 import GuestRoute from "./components/GuestRoute/GuestRoute";
@@ -42,6 +44,7 @@ function App() {
         />
         <Route path="/courses" element={<Courses />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route
           path="/courses/:id"
           element={
@@ -127,6 +130,14 @@ function App() {
           element={
             <AdminRoute>
               <AdminUsers />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/contacts"
+          element={
+            <AdminRoute>
+              <AdminContacts />
             </AdminRoute>
           }
         />
