@@ -26,26 +26,20 @@
   position: relative;
 }
 
-.adPlaceholder {
+.sidebarAd {
   width: 190px;
-  min-height: 600px;
-  border-radius: var(--radius-lg);
-  border: 2px dashed rgba(255, 122, 26, 0.35);
-  background: rgba(255, 122, 26, 0.08);
-  color: var(--primary-600);
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: var(--spacing-lg) var(--spacing-sm);
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  letter-spacing: 0.2em;
   position: sticky;
   top: 110px;
-  box-shadow: var(--shadow-md);
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
+}
+
+.sidebarAd :global(.adContainer) {
+  width: 100%;
+  min-height: 600px;
+  border: none;
+  background: transparent;
+  padding: 0;
 }
 
 @media (max-width: 1400px) {

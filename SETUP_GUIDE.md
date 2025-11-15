@@ -253,6 +253,61 @@ mkdir -p server/uploads
 
 ---
 
+## Google AdSense Setup (Optional)
+
+Google AdSense integration allows you to display ads to non-subscribed users, generating revenue from your platform.
+
+### How It Works
+
+- **Subscribed Users**: Users who have enrolled in paid courses or have an active subscription will NOT see ads
+- **Non-Subscribed Users**: Users who haven't enrolled in any paid courses will see ads
+- **Guest Users**: Non-logged-in users will see ads
+
+### Setup Steps
+
+1. **Create Google AdSense Account**
+   - Go to [Google AdSense](https://www.google.com/adsense/)
+   - Sign up with your Google account
+   - Complete the application process (may take a few days for approval)
+
+2. **Get Publisher ID**
+   - Once approved, go to your AdSense dashboard
+   - Navigate to "Account" → "Account Information"
+   - Copy your Publisher ID (format: `ca-pub-xxxxxxxxxxxxxxxx`)
+
+3. **Create Ad Units (Optional)**
+   - Go to "Ads" → "By ad unit"
+   - Create different ad units for different placements:
+     - Sidebar ads (vertical)
+     - Banner ads (horizontal)
+     - In-content ads
+   - Note the ad slot IDs for each unit (you can use custom slot names)
+
+4. **Add to Environment Variables**
+   - Add `VITE_GOOGLE_ADSENSE_PUBLISHER_ID` to your `client/.env` file (see Frontend Environment Variables section below)
+
+5. **Ad Placement**
+   - Ads are automatically placed in:
+     - Left and right sidebars (on desktop)
+     - Banner areas on Home, Courses, and Lecture pages
+   - Ads only show to non-subscribed users
+   - Ads are hidden for subscribed users automatically
+
+### Testing
+
+- Without Publisher ID: Ads won't display (component returns null)
+- With Publisher ID: Ads will display for non-subscribed users
+- Subscribed users: No ads will be shown
+
+### Revenue Optimization Tips
+
+- Place ads in high-traffic areas (sidebars, between content)
+- Use responsive ad formats for better mobile experience
+- Monitor AdSense dashboard for performance metrics
+- Ensure compliance with Google AdSense policies
+
+---
+
 ## Environment Variables
 
 ### Backend Environment Variables (`server/.env`)
@@ -293,6 +348,9 @@ Create a `.env` file in the `client` directory:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
+
+# Google AdSense Configuration (Optional - for ad revenue)
+VITE_GOOGLE_ADSENSE_PUBLISHER_ID=ca-pub-xxxxxxxxxxxxxxxx
 ```
 
 For production:

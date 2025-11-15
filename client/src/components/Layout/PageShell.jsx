@@ -1,4 +1,5 @@
 import Navbar from '../Navbar/Navbar';
+import GoogleAd from '../GoogleAd/GoogleAd';
 import styles from './PageShell.module.css';
 
 export default function PageShell({ children, contentClassName = '', hideAds = false }) {
@@ -15,17 +16,21 @@ export default function PageShell({ children, contentClassName = '', hideAds = f
       <div className={frameClass}>
         {!hideAds && (
           <aside className={`${styles.adRail} ${styles.left}`}> 
-            <div className={styles.adPlaceholder}>
-              Promotional Space
-            </div>
+            <GoogleAd 
+              slot="default"
+              format="auto"
+              className={styles.sidebarAd}
+            />
           </aside>
         )}
         <main className={mainClass}>{children}</main>
         {!hideAds && (
           <aside className={`${styles.adRail} ${styles.right}`}>
-            <div className={styles.adPlaceholder}>
-              Promotional Space
-            </div>
+            <GoogleAd 
+              slot="default"
+              format="auto"
+              className={styles.sidebarAd}
+            />
           </aside>
         )}
       </div>

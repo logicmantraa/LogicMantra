@@ -158,6 +158,7 @@ export const userAPI = {
   deleteUser: (id) => apiRequest(`/users/${id}`, {
     method: 'DELETE',
   }),
+  checkSubscription: () => apiRequest('/users/check-subscription'),
 };
 
 // Lecture API

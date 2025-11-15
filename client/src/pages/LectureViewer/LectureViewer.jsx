@@ -4,6 +4,7 @@ import { courseAPI, enrollmentAPI } from '../../utils/api'
 import { useAuth } from '../../context/AuthContext'
 import PageShell from '../../components/Layout/PageShell'
 import ProtectedRoute from '../../components/ProtectedRoute/ProtectedRoute'
+import GoogleAd from '../../components/GoogleAd/GoogleAd'
 import styles from './LectureViewer.module.css'
 
 export default function LectureViewer() {
@@ -264,7 +265,11 @@ export default function LectureViewer() {
           <p className={styles.courseTitle}>{course?.title}</p>
         </div>
 
-        <div className={styles.adPlaceholder}>Space for future ads or course highlights</div>
+        <GoogleAd 
+          slot="default"
+          format="auto"
+          className={styles.bannerAd}
+        />
 
         <div className={styles.content}>
           <div className={styles.videoSection}>

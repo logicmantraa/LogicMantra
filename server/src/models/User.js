@@ -30,6 +30,14 @@ const userSchema = new mongoose.Schema({
   emailVerifiedAt: {
     type: Date,
     default: null
+  },
+  hasSubscription: {
+    type: Boolean,
+    default: false
+  },
+  subscriptionExpiresAt: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 

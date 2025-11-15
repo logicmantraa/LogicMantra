@@ -188,6 +188,9 @@ Create a `.env` file in the `client` directory:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
+
+# Google AdSense Configuration (Optional - for ad revenue)
+VITE_GOOGLE_ADSENSE_PUBLISHER_ID=ca-pub-xxxxxxxxxxxxxxxx
 ```
 
 **Note**: Email configuration is **required** for user registration (OTP verification). See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed email setup instructions.
@@ -415,6 +418,8 @@ LogicMantra/
 - ✅ Email notifications (registration, enrollment, contact)
 - ✅ Admin contact submission management
 - ✅ Status tracking for contact submissions
+- ✅ Forgot password with OTP verification
+- ✅ Google Ads integration for unsubscribed users
 
 ## Pending Features for Version 1.0
 

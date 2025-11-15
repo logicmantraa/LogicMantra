@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import PageShell from '../../components/Layout/PageShell'
+import GoogleAd from '../../components/GoogleAd/GoogleAd'
 import styles from './Home.module.css'
 
 export default function Home() {
@@ -177,7 +178,11 @@ export default function Home() {
       </section>
 
       <section className={styles.adSection}>
-        <div className={styles.adPlaceholder}>Premium placement reserved for future Google Ads & community announcements.</div>
+        <GoogleAd 
+          slot="default"
+          format="auto"
+          className={styles.bannerAd}
+        />
       </section>
     </PageShell>
   )
