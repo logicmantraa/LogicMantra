@@ -46,6 +46,14 @@ export const authAPI = {
     method: 'POST',
     body: credentials,
   }),
+  verifyEmail: (email, otp) => apiRequest('/auth/verify-email', {
+    method: 'POST',
+    body: { email, otp },
+  }),
+  resendOTP: (email) => apiRequest('/auth/resend-otp', {
+    method: 'POST',
+    body: { email },
+  }),
   getProfile: () => apiRequest('/auth/profile'),
   updateProfile: (userData) => apiRequest('/auth/profile', {
     method: 'PUT',

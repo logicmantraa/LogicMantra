@@ -293,6 +293,92 @@ export const enrollmentConfirmationEmailTemplate = (userName, courseTitle) => {
   `;
 };
 
+export const otpVerificationEmailTemplate = (userName, otp) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 10px 10px 0 0;
+        }
+        .content {
+          background: #f9fafb;
+          padding: 30px;
+          border-radius: 0 0 10px 10px;
+        }
+        .otp-box {
+          background: white;
+          border: 3px dashed #0ea5e9;
+          border-radius: 10px;
+          padding: 30px;
+          text-align: center;
+          margin: 30px 0;
+        }
+        .otp-code {
+          font-size: 3rem;
+          font-weight: 800;
+          letter-spacing: 10px;
+          color: #0ea5e9;
+          margin: 20px 0;
+          font-family: 'Courier New', monospace;
+        }
+        .warning {
+          background: #fef3c7;
+          border-left: 4px solid #f59e0b;
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 5px;
+          color: #92400e;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 30px;
+          color: #6b7280;
+          font-size: 12px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Verify Your Email Address 🔐</h1>
+      </div>
+      <div class="content">
+        <h2>Hello ${userName}!</h2>
+        <p>Thank you for signing up for Logic Mantraa! To complete your registration, please verify your email address using the OTP below.</p>
+        <div class="otp-box">
+          <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 0.9rem;">Your verification code is:</p>
+          <div class="otp-code">${otp}</div>
+          <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 0.85rem;">This code will expire in 10 minutes</p>
+        </div>
+        <div class="warning">
+          <strong>⚠️ Security Notice:</strong> Never share this code with anyone. Logic Mantraa staff will never ask for your verification code.
+        </div>
+        <p>If you didn't create an account with Logic Mantraa, please ignore this email.</p>
+        <p>Best regards,<br>The Logic Mantraa Team</p>
+      </div>
+      <div class="footer">
+        <p>© ${new Date().getFullYear()} Logic Mantraa. All rights reserved.</p>
+        <p>91/4 Knowledge Park, Bengaluru, India</p>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
 export const courseCompletionEmailTemplate = (userName, courseTitle) => {
   return `
     <!DOCTYPE html>

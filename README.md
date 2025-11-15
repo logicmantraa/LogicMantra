@@ -4,7 +4,7 @@ A comprehensive MERN stack-based educational technology platform that provides a
 
 ![Logic Mantraa](client/public/Logo.png)
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -16,77 +16,93 @@ A comprehensive MERN stack-based educational technology platform that provides a
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
 - [User Roles](#user-roles)
-- [Future Enhancements](#future-enhancements)
+- [Version 1.0 Features](#-version-10-features-completed)
+- [Pending Features](#-pending-features-for-version-10)
+- [Future Enhancements](#-future-enhancements-version-20)
+- [Setup Guide](#-setup-guide)
 - [Contributing](#contributing)
 - [License](#license)
 
-## 🎯 Overview
+## Overview
 
 Logic Mantraa is a full-stack web application designed to deliver online courses, lectures, and educational resources. The platform supports two types of users:
 
 - **Students**: Browse courses, enroll in programs, watch lectures, access resources, and track their learning progress
 - **Administrators**: Manage courses, lectures, resources, users, and store items through an intuitive dashboard
 
-## ✨ Features
+## Features
 
 ### Student Features
 
 #### Basic Features
-- ✅ User registration and authentication
+- ✅ User registration with email verification (OTP)
+- ✅ Email verification via 6-digit OTP
 - ✅ Profile management (name, email, phone number)
 - ✅ Password update functionality
 - ✅ Secure login/logout
 
 #### Primary Features
-- 🔍 **Course Discovery**
+- **Course Discovery**
   - Search courses by name, instructor, or keyword
   - Filter courses by category, level, rating, and price
   - View detailed course information
 
-- 📚 **Learning Experience**
+- **Learning Experience**
   - Enroll in free and paid courses
   - Watch video lectures (YouTube integration)
   - Access downloadable resources (notes, practice sheets)
   - Track course completion progress
   - Mark lectures as complete
 
-- ⭐ **Engagement**
+- **Engagement**
   - Rate courses (1-5 stars)
   - Provide text feedback/reviews
   - View ratings and reviews from other students
 
-- 🛒 **Store**
+- **Store**
   - Browse additional educational resources
   - Purchase supplementary materials
 
-- 📊 **Progress Tracking**
+- **Contact & Support**
+  - Contact form with intent categorization
+  - Email confirmations
+  - Admin contact management
+
+- **Progress Tracking**
   - View enrolled courses in "My Courses"
   - Track completion percentage
   - See recommended courses
 
 ### Admin Features
 
-- 📊 **Analytics Dashboard**
+- **Analytics Dashboard**
   - View platform statistics
   - Monitor user engagement
   - Track course performance
 
-- 🎓 **Content Management**
+- **Content Management**
   - Create, update, and delete courses
   - Add lectures to courses (YouTube links)
   - Upload and manage resources (PDFs, notes, practice sheets)
   - Set course pricing and categories
 
-- 👥 **User Management**
+- **User Management**
   - View all registered users
   - Access user details
   - Manage user accounts
 
-- 🛍️ **Store Management**
+- **Store Management**
   - Add, update, and delete store items
   - Manage pricing and availability
 
-## 🛠️ Tech Stack
+- **Contact Management**
+  - View all contact form submissions
+  - Filter by status (new, read, replied, archived)
+  - Filter by intent (learn, teach, partner)
+  - Update submission status
+  - Email notifications for new submissions
+
+## Tech Stack
 
 ### Frontend
 - **React 19.1.1** - UI library
@@ -104,7 +120,7 @@ Logic Mantraa is a full-stack web application designed to deliver online courses
 - **Multer 2.0.2** - File upload handling
 - **CORS 2.8.5** - Cross-origin resource sharing
 
-## 📦 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -112,7 +128,7 @@ Before you begin, ensure you have the following installed:
 - **npm** or **yarn**
 - **MongoDB** (local installation or MongoDB Atlas account)
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the Repository
 
@@ -135,11 +151,15 @@ cd ../client
 npm install
 ```
 
-## ⚙️ Configuration
+## Configuration
 
-### Backend Configuration
+For detailed setup instructions, see **[SETUP_GUIDE.md](./SETUP_GUIDE.md)**
 
-1. Create a `.env` file in the `server` directory:
+### Quick Configuration
+
+#### Backend Configuration
+
+Create a `.env` file in the `server` directory:
 
 ```env
 NODE_ENV=development
@@ -147,7 +167,7 @@ PORT=5000
 MONGO_URI=mongodb://localhost:27017/logicmantraa
 JWT_SECRET=your_super_secret_jwt_key_here
 
-# Email Configuration (Optional - for notifications)
+# Email Configuration (Required for email verification)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_SECURE=false
@@ -155,25 +175,24 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
 EMAIL_FROM_NAME=Logic Mantraa
 FRONTEND_URL=http://localhost:5173
+
+# Cloudinary Configuration (Optional - for cloud file storage)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 ```
 
-2. Update `MONGO_URI` with your MongoDB connection string:
-   - For local MongoDB: `mongodb://localhost:27017/logicmantraa`
-   - For MongoDB Atlas: `mongodb+srv://username:password@cluster.mongodb.net/logicmantraa`
+#### Frontend Configuration
 
-3. Generate a secure `JWT_SECRET` (you can use any random string)
-
-### Frontend Configuration
-
-1. Create a `.env` file in the `client` directory:
+Create a `.env` file in the `client` directory:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-2. Update `VITE_API_URL` if your backend runs on a different port or domain
+**Note**: Email configuration is **required** for user registration (OTP verification). See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed email setup instructions.
 
-## 🏃 Running the Application
+## Running the Application
 
 ### Development Mode
 
@@ -211,7 +230,7 @@ cd server
 npm start
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 LogicMantra/
@@ -234,6 +253,14 @@ LogicMantra/
 │   │   ├── pages/          # Page components
 │   │   │   ├── About/
 │   │   │   ├── Admin/      # Admin pages
+│   │   │   │   ├── Contacts/
+│   │   │   │   ├── Courses/
+│   │   │   │   ├── Dashboard/
+│   │   │   │   ├── Lectures/
+│   │   │   │   ├── Resources/
+│   │   │   │   ├── StoreItems/
+│   │   │   │   └── Users/
+│   │   │   ├── Contact/
 │   │   │   ├── CourseDetail/
 │   │   │   ├── Courses/
 │   │   │   ├── Home/
@@ -253,10 +280,12 @@ LogicMantra/
     ├── src/
     │   ├── config/         # Configuration files
     │   │   ├── db.js       # Database connection
+    │   │   ├── email.js    # Email service configuration
     │   │   └── upload.js   # File upload config
     │   ├── controllers/    # Route controllers
     │   │   ├── adminController.js
     │   │   ├── authController.js
+    │   │   ├── contactController.js
     │   │   ├── courseController.js
     │   │   ├── enrollmentController.js
     │   │   ├── lectureController.js
@@ -268,9 +297,11 @@ LogicMantra/
     │   │   ├── authMiddleware.js
     │   │   └── errorHandler.js
     │   ├── models/         # Mongoose models
+    │   │   ├── Contact.js
     │   │   ├── Course.js
     │   │   ├── Enrollment.js
     │   │   ├── Lecture.js
+    │   │   ├── PendingRegistration.js
     │   │   ├── Rating.js
     │   │   ├── Resource.js
     │   │   ├── StoreItem.js
@@ -278,6 +309,7 @@ LogicMantra/
     │   ├── routes/         # API routes
     │   │   ├── admin.js
     │   │   ├── auth.js
+    │   │   ├── contact.js
     │   │   ├── course.js
     │   │   ├── enrollment.js
     │   │   ├── lecture.js
@@ -286,17 +318,21 @@ LogicMantra/
     │   │   ├── store.js
     │   │   └── user.js
     │   ├── utils/          # Utility functions
-    │   │   └── generateToken.js
+    │   │   ├── emailTemplates.js  # Email HTML templates
+    │   │   ├── generateOTP.js     # OTP generation utility
+    │   │   └── generateToken.js  # JWT token generation
     │   └── server.js       # Server entry point
     ├── package.json
     └── .env               # Environment variables (create this)
 ```
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
+- `POST /api/auth/register` - Register a new user (creates pending registration, sends OTP)
+- `POST /api/auth/verify-email` - Verify email with OTP (creates user account)
+- `POST /api/auth/resend-otp` - Resend OTP for email verification
+- `POST /api/auth/login` - Login user (requires verified email)
 - `GET /api/auth/profile` - Get user profile
 - `PUT /api/auth/profile` - Update user profile
 - `PUT /api/auth/update-password` - Update password
@@ -340,12 +376,19 @@ LogicMantra/
 - `PUT /api/store/:id` - Update store item (Admin only)
 - `DELETE /api/store/:id` - Delete store item (Admin only)
 
+### Contact
+- `POST /api/contact` - Submit contact form (public)
+- `GET /api/contact` - Get all contact submissions (Admin only)
+- `GET /api/contact/:id` - Get contact submission by ID (Admin only)
+- `PUT /api/contact/:id` - Update contact status (Admin only)
+- `DELETE /api/contact/:id` - Delete contact submission (Admin only)
+
 ### Admin
 - `GET /api/admin/stats` - Get platform statistics
 - `GET /api/admin/users` - Get all users (Admin only)
 - `GET /api/admin/users/:id` - Get user by ID (Admin only)
 
-## 👥 User Roles
+## User Roles
 
 ### Student
 - Default role for all registered users
@@ -363,23 +406,47 @@ LogicMantra/
 - Has access to analytics dashboard
 - Can add lectures and resources directly from course pages
 
-**Note**: To create an admin user, you need to manually set `isAdmin: true` in the MongoDB database for the user document.
+**Note**: To create an admin user, you need to manually set `isAdmin: true` in the MongoDB database for the user document. See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed instructions.
 
-## 🚧 Future Enhancements
+## Version 1.0 Features (Completed)
+
+- ✅ Email verification with OTP during signup
+- ✅ Contact form with admin management
+- ✅ Email notifications (registration, enrollment, contact)
+- ✅ Admin contact submission management
+- ✅ Status tracking for contact submissions
+
+## Pending Features for Version 1.0
 
 - [ ] Payment gateway integration (Razorpay)
-- [ ] Video upload functionality (AWS S3 or similar)
-- [ ] Google Ads integration for unsubscribed users
-- [ ] Email notifications
 - [ ] Certificate generation upon course completion
+- [ ] Google Ads integration for unsubscribed users
+
+## Future Enhancements (Version 2.0)
+
+- [ ] Video upload functionality (AWS S3 or Cloudinary)
 - [ ] Discussion forums for courses
 - [ ] Live classes/sessions
 - [ ] Mobile app (React Native)
 - [ ] Advanced analytics and reporting
 - [ ] Multi-language support
 - [ ] Dark mode theme
+- [ ] Interactive quizzes and assessments
+- [ ] Learning paths and recommendations
 
-## 🤝 Contributing
+## Setup Guide
+
+For complete setup instructions including MongoDB, Email, and Cloudinary configuration, see **[SETUP_GUIDE.md](./SETUP_GUIDE.md)**
+
+The setup guide includes:
+- Step-by-step MongoDB setup (local and Atlas)
+- Email service configuration (Gmail, SendGrid, Mailgun)
+- Cloudinary setup for cloud file storage
+- Environment variables reference
+- Troubleshooting common issues
+- Creating admin users
+
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -389,21 +456,21 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the ISC License.
 
-## 👤 Author
+## Author
 
 **Logic Mantraa Team**
 
 ---
 
-## 📞 Support
+## Support
 
 For support, email support@logicmantraa.com or create an issue in the repository.
 
 ---
 
-**Built with ❤️ using the MERN stack**
+**Built with the MERN stack**
 

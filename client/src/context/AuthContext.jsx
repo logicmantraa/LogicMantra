@@ -63,14 +63,39 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const data = await authAPI.register({ name, email, password, phoneNumber });
+      // Registration now only creates pending registration, no token yet
+      return data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const verifyEmail = async (email, otp) => {
+    try {
+      setError(null);
+      const data = await authAPI.verifyEmail(email, otp);
+      // After verification, user is created and token is returned
       localStorage.setItem('token', data.token);
       setUser({
-        _id: data._id,
-        name: data.name,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        isAdmin: data.isAdmin,
+        _id: data.user._id,
+        name: data.user.name,
+        email: data.user.email,
+        phoneNumber: data.user.phoneNumber,
+        isAdmin: data.user.isAdmin,
+        emailVerified: data.user.emailVerified,
       });
+      return data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const resendOTP = async (email) => {
+    try {
+      setError(null);
+      const data = await authAPI.resendOTP(email);
       return data;
     } catch (err) {
       setError(err.message);
@@ -125,6 +150,8 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     register,
+    verifyEmail,
+    resendOTP,
     logout,
     updateProfile,
     updatePassword,

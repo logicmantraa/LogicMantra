@@ -1,49 +1,61 @@
 import User from '../models/User.js';
+import PendingRegistration from '../models/PendingRegistration.js';
 import generateToken from '../utils/generateToken.js';
 import { sendEmail } from '../config/email.js';
-import { welcomeEmailTemplate } from '../utils/emailTemplates.js';
+import { welcomeEmailTemplate, otpVerificationEmailTemplate } from '../utils/emailTemplates.js';
+import { generateOTPWithExpiry } from '../utils/generateOTP.js';
+import bcrypt from 'bcryptjs';
 
-// @desc    Register a new user
+// @desc    Register a new user (creates pending registration, user created after verification)
 // @route   POST /api/auth/register
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
 
-    const userExists = await User.findOne({ email });
-
+    // Check if user already exists
+    const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
       res.status(400);
       throw new Error('User already exists');
     }
 
-    const user = await User.create({
+    // Check if there's a pending registration
+    const pendingExists = await PendingRegistration.findOne({ email: email.toLowerCase() });
+    if (pendingExists) {
+      res.status(400);
+      throw new Error('Registration already in progress. Please check your email for the verification code.');
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Generate OTP
+    const { otp, expiresAt } = generateOTPWithExpiry(10); // 10 minutes expiry
+
+    // Create pending registration (user not created yet)
+    const pendingRegistration = await PendingRegistration.create({
       name,
-      email,
-      password,
+      email: email.toLowerCase(),
+      password: hashedPassword,
       phoneNumber: phoneNumber || '',
+      otp,
+      expiresAt,
     });
 
-    if (user) {
-      // Send welcome email (async, don't wait for it)
-      sendEmail({
-        to: user.email,
-        subject: 'Welcome to Logic Mantraa! 🎉',
-        html: welcomeEmailTemplate(user.name)
-      }).catch(err => console.error('Failed to send welcome email:', err));
+    // Send OTP email (async, don't wait for it)
+    sendEmail({
+      to: email,
+      subject: 'Verify Your Email - Logic Mantraa',
+      html: otpVerificationEmailTemplate(name, otp)
+    }).catch(err => console.error('Failed to send OTP email:', err));
 
       res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id),
+      message: 'Please check your email for verification code.',
+      email: pendingRegistration.email,
+      requiresVerification: true,
       });
-    } else {
-      res.status(400);
-      throw new Error('Invalid user data');
-    }
   } catch (error) {
     res.status(res.statusCode === 200 ? 500 : res.statusCode);
     res.json({
@@ -60,15 +72,23 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    // Search with lowercase email to match registration
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (user && (await user.matchPassword(password))) {
+      // Check if email is verified
+      if (!user.emailVerified) {
+        res.status(403);
+        throw new Error('Please verify your email address before logging in. Check your inbox for the verification code.');
+      }
+
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         phoneNumber: user.phoneNumber,
         isAdmin: user.isAdmin,
+        emailVerified: user.emailVerified,
         token: generateToken(user._id),
       });
     } else {
@@ -98,6 +118,7 @@ export const getUserProfile = async (req, res) => {
         email: user.email,
         phoneNumber: user.phoneNumber,
         isAdmin: user.isAdmin,
+        emailVerified: user.emailVerified,
       });
     } else {
       res.status(404);
@@ -121,7 +142,10 @@ export const updateUserProfile = async (req, res) => {
 
     if (user) {
       user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
+      // Normalize email to lowercase
+      if (req.body.email) {
+        user.email = req.body.email.toLowerCase();
+      }
       if (req.body.phoneNumber !== undefined) {
         user.phoneNumber = req.body.phoneNumber || '';
       }
@@ -134,6 +158,7 @@ export const updateUserProfile = async (req, res) => {
         email: updatedUser.email,
         phoneNumber: updatedUser.phoneNumber,
         isAdmin: updatedUser.isAdmin,
+        emailVerified: updatedUser.emailVerified,
         token: generateToken(updatedUser._id),
       });
     } else {
@@ -181,6 +206,158 @@ export const updatePassword = async (req, res) => {
     res.json({
       message: 'Password updated successfully',
       token: generateToken(user._id),
+    });
+  } catch (error) {
+    res.status(res.statusCode === 200 ? 500 : res.statusCode);
+    res.json({
+      message: error.message,
+      stack: process.env.NODE_ENV === 'production' ? null : error.stack,
+    });
+  }
+};
+
+// @desc    Verify email with OTP and create user account
+// @route   POST /api/auth/verify-email
+// @access  Public
+export const verifyEmail = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      res.status(400);
+      throw new Error('Please provide email and OTP');
+    }
+
+    // Find pending registration
+    const pendingRegistration = await PendingRegistration.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (!pendingRegistration) {
+      res.status(404);
+      throw new Error('No pending registration found. Please register again.');
+    }
+
+    // Check if OTP matches
+    if (pendingRegistration.otp !== otp) {
+      pendingRegistration.attempts += 1;
+      await pendingRegistration.save();
+
+      if (pendingRegistration.attempts >= 5) {
+        await pendingRegistration.deleteOne();
+        res.status(429);
+        throw new Error('Too many verification attempts. Please register again.');
+      }
+
+      res.status(400);
+      throw new Error('Invalid OTP');
+    }
+
+    // Check if OTP is expired
+    if (new Date() > pendingRegistration.expiresAt) {
+      await pendingRegistration.deleteOne();
+      res.status(400);
+      throw new Error('OTP has expired. Please register again.');
+    }
+
+    // Check if user already exists (race condition check)
+    const userExists = await User.findOne({ email: email.toLowerCase() });
+    if (userExists) {
+      await pendingRegistration.deleteOne();
+      res.status(400);
+      throw new Error('User already exists');
+    }
+
+    // Create the actual user account
+    // Password is already hashed in PendingRegistration, so User model will detect it and skip hashing
+    const user = await User.create({
+      name: pendingRegistration.name,
+      email: pendingRegistration.email,
+      password: pendingRegistration.password, // Already hashed (starts with $2b$)
+      phoneNumber: pendingRegistration.phoneNumber,
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
+    });
+
+    // Delete pending registration
+    await pendingRegistration.deleteOne();
+
+    // Send welcome email after verification
+    sendEmail({
+      to: user.email,
+      subject: 'Welcome to Logic Mantraa! 🎉',
+      html: welcomeEmailTemplate(user.name)
+    }).catch(err => console.error('Failed to send welcome email:', err));
+
+    res.json({
+      message: 'Email verified successfully!',
+      token: generateToken(user._id),
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        isAdmin: user.isAdmin,
+        emailVerified: user.emailVerified,
+      },
+    });
+  } catch (error) {
+    res.status(res.statusCode === 200 ? 500 : res.statusCode);
+    res.json({
+      message: error.message,
+      stack: process.env.NODE_ENV === 'production' ? null : error.stack,
+    });
+  }
+};
+
+// @desc    Resend OTP
+// @route   POST /api/auth/resend-otp
+// @access  Public
+export const resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400);
+      throw new Error('Please provide email address');
+    }
+
+    // Find pending registration
+    const pendingRegistration = await PendingRegistration.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (!pendingRegistration) {
+      res.status(404);
+      throw new Error('No pending registration found. Please register again.');
+    }
+
+    // Check if user already exists (shouldn't happen, but safety check)
+    const userExists = await User.findOne({ email: email.toLowerCase() });
+    if (userExists) {
+      await pendingRegistration.deleteOne();
+      res.status(400);
+      throw new Error('User already exists');
+    }
+
+    // Generate new OTP
+    const { otp, expiresAt } = generateOTPWithExpiry(10);
+
+    // Update pending registration with new OTP
+    pendingRegistration.otp = otp;
+    pendingRegistration.expiresAt = expiresAt;
+    pendingRegistration.attempts = 0; // Reset attempts
+    await pendingRegistration.save();
+
+    // Send OTP email
+    sendEmail({
+      to: email,
+      subject: 'Verify Your Email - Logic Mantraa',
+      html: otpVerificationEmailTemplate(pendingRegistration.name, otp)
+    }).catch(err => console.error('Failed to send OTP email:', err));
+
+    res.json({
+      message: 'OTP has been sent to your email address. Please check your inbox.',
     });
   } catch (error) {
     res.status(res.statusCode === 200 ? 500 : res.statusCode);

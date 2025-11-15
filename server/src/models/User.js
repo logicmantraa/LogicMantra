@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     default: ''
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerifiedAt: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 
@@ -29,6 +37,11 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
     return next();
+  }
+  
+  // Check if password is already hashed (bcrypt hashes start with $2a$, $2b$, or $2y$)
+  if (this.password.startsWith('$2a$') || this.password.startsWith('$2b$') || this.password.startsWith('$2y$')) {
+    return next(); // Password is already hashed, skip hashing
   }
   
   const salt = await bcrypt.genSalt(10);
