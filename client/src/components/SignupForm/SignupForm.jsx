@@ -40,7 +40,13 @@ export default function SignupForm() {
         setStep('verify')
       }
     } catch (err) {
-      setError(err.message || 'Failed to register')
+      // If registration is already in progress, switch to OTP verification step
+      if (err.message && err.message.includes('Registration already in progress')) {
+        setStep('verify')
+        setError('A verification code was already sent to your email. Please enter it below or resend a new code.')
+      } else {
+        setError(err.message || 'Failed to register')
+      }
     } finally {
       setLoading(false)
     }

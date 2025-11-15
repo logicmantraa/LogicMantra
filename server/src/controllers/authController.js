@@ -21,13 +21,6 @@ export const registerUser = async (req, res) => {
       throw new Error('User already exists');
     }
 
-    // Check if there's a pending registration
-    const pendingExists = await PendingRegistration.findOne({ email: email.toLowerCase() });
-    if (pendingExists) {
-      res.status(400);
-      throw new Error('Registration already in progress. Please check your email for the verification code.');
-    }
-
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -35,15 +28,29 @@ export const registerUser = async (req, res) => {
     // Generate OTP
     const { otp, expiresAt } = generateOTPWithExpiry(10); // 10 minutes expiry
 
-    // Create pending registration (user not created yet)
-    const pendingRegistration = await PendingRegistration.create({
-      name,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      phoneNumber: phoneNumber || '',
-      otp,
-      expiresAt,
-    });
+    // Check if there's a pending registration - update it instead of creating new one
+    let pendingRegistration = await PendingRegistration.findOne({ email: email.toLowerCase() });
+    
+    if (pendingRegistration) {
+      // Update existing pending registration with new details and OTP
+      pendingRegistration.name = name;
+      pendingRegistration.password = hashedPassword;
+      pendingRegistration.phoneNumber = phoneNumber || '';
+      pendingRegistration.otp = otp;
+      pendingRegistration.expiresAt = expiresAt;
+      pendingRegistration.attempts = 0; // Reset attempts
+      await pendingRegistration.save();
+    } else {
+      // Create new pending registration (user not created yet)
+      pendingRegistration = await PendingRegistration.create({
+        name,
+        email: email.toLowerCase(),
+        password: hashedPassword,
+        phoneNumber: phoneNumber || '',
+        otp,
+        expiresAt,
+      });
+    }
 
     // Send OTP email (async, don't wait for it)
     sendEmail({
