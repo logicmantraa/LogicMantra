@@ -379,6 +379,101 @@ export const otpVerificationEmailTemplate = (userName, otp) => {
   `;
 };
 
+export const passwordResetEmailTemplate = (userName, otp) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+          color: white;
+          padding: 30px;
+          text-align: center;
+          border-radius: 10px 10px 0 0;
+        }
+        .content {
+          background: #f9fafb;
+          padding: 30px;
+          border-radius: 0 0 10px 10px;
+        }
+        .otp-box {
+          background: white;
+          border: 3px dashed #ef4444;
+          border-radius: 10px;
+          padding: 30px;
+          text-align: center;
+          margin: 30px 0;
+        }
+        .otp-code {
+          font-size: 3rem;
+          font-weight: 800;
+          letter-spacing: 10px;
+          color: #ef4444;
+          margin: 20px 0;
+          font-family: 'Courier New', monospace;
+        }
+        .warning {
+          background: #fef3c7;
+          border-left: 4px solid #f59e0b;
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 5px;
+          color: #92400e;
+        }
+        .button {
+          display: inline-block;
+          padding: 12px 30px;
+          background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+          color: white;
+          text-decoration: none;
+          border-radius: 5px;
+          margin: 20px 0;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 30px;
+          color: #6b7280;
+          font-size: 12px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Reset Your Password 🔒</h1>
+      </div>
+      <div class="content">
+        <h2>Hello ${userName}!</h2>
+        <p>We received a request to reset your password for your Logic Mantraa account. Use the OTP below to verify your identity and set a new password.</p>
+        <div class="otp-box">
+          <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 0.9rem;">Your password reset code is:</p>
+          <div class="otp-code">${otp}</div>
+          <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 0.85rem;">This code will expire in 10 minutes</p>
+        </div>
+        <div class="warning">
+          <strong>⚠️ Security Notice:</strong> Never share this code with anyone. If you didn't request a password reset, please ignore this email and your password will remain unchanged.
+        </div>
+        <p>After verifying the code, you'll be able to set a new password for your account.</p>
+        <p>Best regards,<br>The Logic Mantraa Team</p>
+      </div>
+      <div class="footer">
+        <p>© ${new Date().getFullYear()} Logic Mantraa. All rights reserved.</p>
+        <p>91/4 Knowledge Park, Bengaluru, India</p>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
 export const courseCompletionEmailTemplate = (userName, courseTitle) => {
   return `
     <!DOCTYPE html>

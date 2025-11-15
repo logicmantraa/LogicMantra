@@ -54,6 +54,14 @@ export const authAPI = {
     method: 'POST',
     body: { email },
   }),
+  forgotPassword: (email) => apiRequest('/auth/forgot-password', {
+    method: 'POST',
+    body: { email },
+  }),
+  resetPassword: (email, otp, newPassword) => apiRequest('/auth/reset-password', {
+    method: 'POST',
+    body: { email, otp, newPassword },
+  }),
   getProfile: () => apiRequest('/auth/profile'),
   updateProfile: (userData) => apiRequest('/auth/profile', {
     method: 'PUT',

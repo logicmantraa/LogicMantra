@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import SignupForm from "./components/SignupForm/SignupForm";
 import LoginForm from "./components/LoginForm/LoginForm";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
@@ -39,6 +41,22 @@ function App() {
           element={
             <GuestRoute>
               <SignupForm />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <GuestRoute>
+              <ForgotPassword />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <GuestRoute>
+              <ResetPassword />
             </GuestRoute>
           }
         />
