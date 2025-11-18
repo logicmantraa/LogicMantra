@@ -57,7 +57,27 @@ export const registerUser = async (req, res) => {
       to: email,
       subject: 'Verify Your Email - Logic Mantraa',
       html: otpVerificationEmailTemplate(name, otp)
-    }).catch(err => console.error('Failed to send OTP email:', err));
+    })
+    .then(result => {
+      if (result && !result.success) {
+        console.error('Failed to send OTP email:', result.error || result.message);
+        console.error('Email configuration check:', {
+          hasUser: !!process.env.EMAIL_USER,
+          hasPassword: !!process.env.EMAIL_PASSWORD,
+          emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
+        });
+      } else {
+        console.log('OTP email sent successfully to:', email);
+      }
+    })
+    .catch(err => {
+      console.error('Failed to send OTP email:', err.message);
+      console.error('Email configuration check:', {
+        hasUser: !!process.env.EMAIL_USER,
+        hasPassword: !!process.env.EMAIL_PASSWORD,
+        emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
+      });
+    });
 
       res.status(201).json({
       message: 'Please check your email for verification code.',
@@ -362,7 +382,27 @@ export const resendOTP = async (req, res) => {
       to: email,
       subject: 'Verify Your Email - Logic Mantraa',
       html: otpVerificationEmailTemplate(pendingRegistration.name, otp)
-    }).catch(err => console.error('Failed to send OTP email:', err));
+    })
+    .then(result => {
+      if (result && !result.success) {
+        console.error('Failed to resend OTP email:', result.error || result.message);
+        console.error('Email configuration check:', {
+          hasUser: !!process.env.EMAIL_USER,
+          hasPassword: !!process.env.EMAIL_PASSWORD,
+          emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
+        });
+      } else {
+        console.log('OTP email resent successfully to:', email);
+      }
+    })
+    .catch(err => {
+      console.error('Failed to resend OTP email:', err.message);
+      console.error('Email configuration check:', {
+        hasUser: !!process.env.EMAIL_USER,
+        hasPassword: !!process.env.EMAIL_PASSWORD,
+        emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
+      });
+    });
 
     res.json({
       message: 'OTP has been sent to your email address. Please check your inbox.',

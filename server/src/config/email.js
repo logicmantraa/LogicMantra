@@ -20,13 +20,28 @@ const createTransporter = () => {
 // Verify email configuration
 export const verifyEmailConfig = async () => {
   try {
+    // Check if email credentials are provided
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      console.warn('⚠️  Email configuration missing: EMAIL_USER or EMAIL_PASSWORD not set');
+      console.warn('   Email notifications (OTP, welcome emails, etc.) will be disabled');
+      console.warn('   To enable emails, set these environment variables in your production environment');
+      return false;
+    }
+
     const transporter = createTransporter();
     await transporter.verify();
-    console.log('Email server is ready to send messages');
+    console.log('✅ Email server is ready to send messages');
+    console.log(`   Using: ${process.env.EMAIL_USER} via ${process.env.EMAIL_HOST || 'smtp.gmail.com'}:${process.env.EMAIL_PORT || '587'}`);
     return true;
   } catch (error) {
-    console.error('Email configuration error:', error.message);
-    console.log('Email notifications will be disabled');
+    console.error('❌ Email configuration error:', error.message);
+    if (error.code === 'EAUTH') {
+      console.error('   Authentication failed. Please check your EMAIL_USER and EMAIL_PASSWORD.');
+      console.error('   For Gmail, make sure you are using an App Password, not your regular password.');
+    } else if (error.code === 'ECONNECTION') {
+      console.error('   Connection failed. Please check your EMAIL_HOST and EMAIL_PORT.');
+    }
+    console.warn('⚠️  Email notifications will be disabled until configuration is fixed');
     return false;
   }
 };
@@ -36,8 +51,13 @@ export const sendEmail = async (options) => {
   try {
     // Check if email is configured
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-      console.log('Email not configured. Skipping email send.');
-      return { success: false, message: 'Email not configured' };
+      console.error('❌ Email not configured. Missing EMAIL_USER or EMAIL_PASSWORD environment variables.');
+      console.error('Please set the following environment variables:');
+      console.error('  - EMAIL_USER (your email address)');
+      console.error('  - EMAIL_PASSWORD (your email app password)');
+      console.error('  - EMAIL_HOST (optional, defaults to smtp.gmail.com)');
+      console.error('  - EMAIL_PORT (optional, defaults to 587)');
+      return { success: false, message: 'Email not configured', error: 'Missing EMAIL_USER or EMAIL_PASSWORD' };
     }
 
     const transporter = createTransporter();
@@ -51,11 +71,17 @@ export const sendEmail = async (options) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.messageId);
+    console.log('✅ Email sent successfully:', info.messageId, 'to:', options.to);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Error sending email:', error.message);
-    return { success: false, error: error.message };
+    console.error('❌ Error sending email:', error.message);
+    console.error('Full error:', error);
+    if (error.code === 'EAUTH') {
+      console.error('Authentication failed. Check your EMAIL_USER and EMAIL_PASSWORD.');
+    } else if (error.code === 'ECONNECTION') {
+      console.error('Connection failed. Check your EMAIL_HOST and EMAIL_PORT.');
+    }
+    return { success: false, error: error.message, code: error.code };
   }
 };
 
