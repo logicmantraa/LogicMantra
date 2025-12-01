@@ -57,26 +57,15 @@ export const registerUser = async (req, res) => {
       to: email,
       subject: 'Verify Your Email - Logic Mantraa',
       html: otpVerificationEmailTemplate(name, otp)
-    })
-    .then(result => {
-      if (result && !result.success) {
-        console.error('Failed to send OTP email:', result.error || result.message);
-        console.error('Email configuration check:', {
-          hasUser: !!process.env.EMAIL_USER,
-          hasPassword: !!process.env.EMAIL_PASSWORD,
-          emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
-        });
+    }).then(result => {
+      if (result.success) {
+        console.log('OTP email sent successfully to', email);
       } else {
-        console.log('OTP email sent successfully to:', email);
+        console.error('Failed to send OTP email to', email, ':', result.message || result.error);
       }
-    })
-    .catch(err => {
-      console.error('Failed to send OTP email:', err.message);
-      console.error('Email configuration check:', {
-        hasUser: !!process.env.EMAIL_USER,
-        hasPassword: !!process.env.EMAIL_PASSWORD,
-        emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
-      });
+    }).catch(err => {
+      console.error('Failed to send OTP email to', email, ':', err.message);
+      console.error('Full error:', err);
     });
 
       res.status(201).json({
@@ -315,7 +304,15 @@ export const verifyEmail = async (req, res) => {
       to: user.email,
       subject: 'Welcome to Logic Mantraa! 🎉',
       html: welcomeEmailTemplate(user.name)
-    }).catch(err => console.error('Failed to send welcome email:', err));
+    }).then(result => {
+      if (result.success) {
+        console.log('Welcome email sent successfully to', user.email);
+      } else {
+        console.error('Failed to send welcome email to', user.email, ':', result.message || result.error);
+      }
+    }).catch(err => {
+      console.error('Failed to send welcome email to', user.email, ':', err.message);
+    });
 
     res.json({
       message: 'Email verified successfully!',
@@ -382,26 +379,14 @@ export const resendOTP = async (req, res) => {
       to: email,
       subject: 'Verify Your Email - Logic Mantraa',
       html: otpVerificationEmailTemplate(pendingRegistration.name, otp)
-    })
-    .then(result => {
-      if (result && !result.success) {
-        console.error('Failed to resend OTP email:', result.error || result.message);
-        console.error('Email configuration check:', {
-          hasUser: !!process.env.EMAIL_USER,
-          hasPassword: !!process.env.EMAIL_PASSWORD,
-          emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
-        });
+    }).then(result => {
+      if (result.success) {
+        console.log('Resend OTP email sent successfully to', email);
       } else {
-        console.log('OTP email resent successfully to:', email);
+        console.error('Failed to resend OTP email to', email, ':', result.message || result.error);
       }
-    })
-    .catch(err => {
-      console.error('Failed to resend OTP email:', err.message);
-      console.error('Email configuration check:', {
-        hasUser: !!process.env.EMAIL_USER,
-        hasPassword: !!process.env.EMAIL_PASSWORD,
-        emailHost: process.env.EMAIL_HOST || 'smtp.gmail.com'
-      });
+    }).catch(err => {
+      console.error('Failed to resend OTP email to', email, ':', err.message);
     });
 
     res.json({
@@ -467,7 +452,15 @@ export const forgotPassword = async (req, res) => {
       to: email,
       subject: 'Reset Your Password - Logic Mantraa',
       html: passwordResetEmailTemplate(user.name, otp),
-    }).catch(err => console.error('Failed to send password reset email:', err));
+    }).then(result => {
+      if (result.success) {
+        console.log('Password reset OTP email sent successfully to', email);
+      } else {
+        console.error('Failed to send password reset email to', email, ':', result.message || result.error);
+      }
+    }).catch(err => {
+      console.error('Failed to send password reset email to', email, ':', err.message);
+    });
 
     res.json({
       message: 'If an account exists with this email, a password reset code has been sent.',
