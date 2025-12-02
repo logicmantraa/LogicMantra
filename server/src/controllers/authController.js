@@ -43,10 +43,10 @@ export const registerUser = async (req, res) => {
     } else {
       // Create new pending registration (user not created yet)
       pendingRegistration = await PendingRegistration.create({
-        name,
+      name,
         email: email.toLowerCase(),
         password: hashedPassword,
-        phoneNumber: phoneNumber || '',
+      phoneNumber: phoneNumber || '',
         otp,
         expiresAt,
       });
