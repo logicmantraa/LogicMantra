@@ -49,9 +49,6 @@ export default function LoginForm() {
           {loading ? 'Logging in...' : 'Login'}
         </button>
         <p>Don't have an account? <Link to="/signup">Signup</Link></p>
-        <p style={{ marginTop: '0.5rem' }}>
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </p>
       </form>
     </div>
   )

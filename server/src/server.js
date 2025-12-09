@@ -17,13 +17,9 @@ import contactRoutes from './routes/contact.js';
 
 // Import middleware
 import { errorHandler, notFound } from './middleware/errorHandler.js';
-import { verifyEmailConfig } from './config/email.js';
 
 // Load environment variables
 dotenv.config();
-
-// Verify email configuration on startup
-verifyEmailConfig();
 
 // Initialize express app
 const app = express();
