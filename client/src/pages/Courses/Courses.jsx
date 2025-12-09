@@ -5,7 +5,6 @@ import { courseAPI } from '../../utils/api'
 import PageShell from '../../components/Layout/PageShell'
 import SearchBar from '../../components/SearchBar/SearchBar'
 import FilterPanel from '../../components/FilterPanel/FilterPanel'
-import GoogleAd from '../../components/GoogleAd/GoogleAd'
 import styles from './Courses.module.css'
 
 const initialCourseForm = {
@@ -230,11 +229,6 @@ export default function Courses() {
           <p className={styles.resultsSummary}>
             {loading ? 'Refreshing catalogue…' : `Showing ${courses.length} curated ${courses.length === 1 ? 'course' : 'courses'}`}
           </p>
-          <GoogleAd 
-            slot="default"
-            format="auto"
-            className={styles.bannerAd}
-          />
         </div>
 
         {loading ? (

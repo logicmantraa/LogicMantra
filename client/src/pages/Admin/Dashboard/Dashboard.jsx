@@ -57,7 +57,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className={styles.adPlaceholder}>Reserved banner for future analytics insights or partner promotions.</div>
+        {/* Reserved banner for future analytics insights or partner promotions - Commented out for v1 */}
+        {/* <div className={styles.adPlaceholder}>Reserved banner for future analytics insights or partner promotions.</div> */}
 
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>

@@ -182,7 +182,8 @@ export default function CourseDetail() {
         </div>
       </div>
 
-      <div className={styles.adPlaceholder}>Future promotional banner — highlight course bundles & partner offers here.</div>
+      {/* Future promotional banner — highlight course bundles & partner offers here - Commented out for v1 */}
+      {/* <div className={styles.adPlaceholder}>Future promotional banner — highlight course bundles & partner offers here.</div> */}
 
       <div className={styles.content}>
         <div className={styles.main}>

@@ -99,7 +99,8 @@ export default function AdminLectures() {
           </button>
         </div>
 
-        <div className={styles.adPlaceholder}>Promote upcoming lecture drops or cohort announcements here.</div>
+        {/* Promote upcoming lecture drops or cohort announcements here - Commented out for v1 */}
+        {/* <div className={styles.adPlaceholder}>Promote upcoming lecture drops or cohort announcements here.</div> */}
 
         <div className={styles.formRow}>
           <label htmlFor="courseSelect" className={styles.courseLabel}>

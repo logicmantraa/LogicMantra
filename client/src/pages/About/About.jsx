@@ -148,9 +148,10 @@ export default function About() {
               </div>
             ))}
           </div>
-          <div className={styles.adSpace}>
+          {/* Dedicated ad slot reserved for future partnerships & Google Ads - Commented out for v1 */}
+          {/* <div className={styles.adSpace}>
             Dedicated ad slot reserved for future partnerships & Google Ads.
-          </div>
+          </div> */}
         </div>
 
         <form className={styles.contactForm} onSubmit={handleSubmit}>

@@ -53,7 +53,8 @@ export default function MyCourses() {
         </div>
       </header>
 
-      <div className={styles.adPlaceholder}>Reserved space for personalised offers & upcoming events</div>
+      {/* Reserved space for personalised offers & upcoming events - Commented out for v1 */}
+      {/* <div className={styles.adPlaceholder}>Reserved space for personalised offers & upcoming events</div> */}
 
       <section className={styles.enrollmentsSection}>
         <div className={styles.sectionHeader}>

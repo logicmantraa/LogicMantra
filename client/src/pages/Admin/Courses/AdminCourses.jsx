@@ -103,7 +103,8 @@ export default function AdminCourses() {
           </button>
         </div>
 
-        <div className={styles.adPlaceholder}>Spot reserved for promoting upcoming course launches and announcements.</div>
+        {/* Spot reserved for promoting upcoming course launches and announcements - Commented out for v1 */}
+        {/* <div className={styles.adPlaceholder}>Spot reserved for promoting upcoming course launches and announcements.</div> */}
 
         {showForm && (
           <div className={styles.formModal}>

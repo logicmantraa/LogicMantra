@@ -140,7 +140,8 @@ export default function Store() {
         className={styles.search}
       />
 
-      <div className={styles.adPlaceholder}>Promote premium bundles here — reserved ad space for future monetisation.</div>
+      {/* Promote premium bundles here — reserved ad space for future monetisation - Commented out for v1 */}
+      {/* <div className={styles.adPlaceholder}>Promote premium bundles here — reserved ad space for future monetisation.</div> */}
 
       {loading ? (
         <div className={styles.loading}>Loading resources...</div>

@@ -114,7 +114,8 @@ export default function AdminResources() {
           </button>
         </div>
 
-        <div className={styles.adPlaceholder}>Showcase premium resource bundles or sponsor messages here.</div>
+        {/* Showcase premium resource bundles or sponsor messages here - Commented out for v1 */}
+        {/* <div className={styles.adPlaceholder}>Showcase premium resource bundles or sponsor messages here.</div> */}
 
         <div className={styles.filters}>
           <div className={styles.filterGroup}>

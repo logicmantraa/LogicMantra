@@ -107,7 +107,8 @@ export default function Profile() {
         </div>
       </header>
 
-      <div className={styles.adPlaceholder}>Future personalisation spot — showcase achievements or tailored offers here.</div>
+      {/* Future personalisation spot — showcase achievements or tailored offers here - Commented out for v1 */}
+      {/* <div className={styles.adPlaceholder}>Future personalisation spot — showcase achievements or tailored offers here.</div> */}
 
       {(message || error) && (
         <div className={`${styles.alert} ${error ? styles.error : styles.success}`}>
