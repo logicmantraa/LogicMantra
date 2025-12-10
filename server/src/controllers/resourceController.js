@@ -2,13 +2,35 @@ import Resource from '../models/Resource.js';
 import Course from '../models/Course.js';
 import Lecture from '../models/Lecture.js';
 
+// @desc    Get resources with optional filtering
+// @route   GET /api/resources
+// @access  Private/Admin
+export const getResources = async (req, res) => {
+  try {
+    const { courseId, lectureId } = req.query;
+
+    const query = {};
+    if (courseId) query.courseId = courseId;
+    if (lectureId) query.lectureId = lectureId;
+
+    const resources = await Resource.find(query)
+      .populate('lectureId', 'title')
+      .populate('courseId', 'title');
+
+    res.json(resources);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get resources by course
 // @route   GET /api/resources/course/:courseId
 // @access  Public
 export const getResourcesByCourse = async (req, res) => {
   try {
     const resources = await Resource.find({ courseId: req.params.courseId })
-      .populate('lectureId', 'title');
+      .populate('lectureId', 'title')
+      .populate('courseId', 'title');
     res.json(resources);
   } catch (error) {
     res.status(500).json({ message: error.message });

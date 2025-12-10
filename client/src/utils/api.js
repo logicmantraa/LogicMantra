@@ -147,23 +147,41 @@ export const userAPI = {
 
 // Lecture API
 export const lectureAPI = {
+  // Compatibility helpers for admin views
+  getCourses: () => apiRequest('/courses'),
+  getLectures: (courseId) => apiRequest(`/lectures/course/${courseId}`),
+
   getLecturesByCourse: (courseId) => apiRequest(`/lectures/course/${courseId}`),
   getLectureById: (id) => apiRequest(`/lectures/${id}`),
-  createLecture: (lectureData) => apiRequest('/lectures', {
-    method: 'POST',
-    body: lectureData,
-  }),
-  updateLecture: (id, lectureData) => apiRequest(`/lectures/${id}`, {
-    method: 'PUT',
-    body: lectureData,
-  }),
-  deleteLecture: (id) => apiRequest(`/lectures/${id}`, {
-    method: 'DELETE',
-  }),
+  createLecture: (courseIdOrData, lectureData) => {
+    const payload = lectureData ? { ...lectureData, courseId: courseIdOrData } : courseIdOrData;
+    return apiRequest('/lectures', {
+      method: 'POST',
+      body: payload,
+    });
+  },
+  updateLecture: (lectureIdOrCourseId, lectureIdOrData, maybeData) => {
+    const id = maybeData ? lectureIdOrData : lectureIdOrCourseId;
+    const payload = maybeData || lectureIdOrData;
+    return apiRequest(`/lectures/${id}`, {
+      method: 'PUT',
+      body: payload,
+    });
+  },
+  deleteLecture: (lectureIdOrCourseId, maybeLectureId) => {
+    const id = maybeLectureId || lectureIdOrCourseId;
+    return apiRequest(`/lectures/${id}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 // Resource API
 export const resourceAPI = {
+  getResources: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/resources${queryString ? `?${queryString}` : ''}`);
+  },
   getResourcesByCourse: (courseId) => apiRequest(`/resources/course/${courseId}`),
   getResourcesByLecture: (lectureId) => apiRequest(`/resources/lecture/${lectureId}`),
   getResourceById: (id) => apiRequest(`/resources/${id}`),

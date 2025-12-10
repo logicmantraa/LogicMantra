@@ -18,6 +18,8 @@ export default function CourseDetail() {
   const [enrolling, setEnrolling] = useState(false)
   const [showLectureModal, setShowLectureModal] = useState(false)
   const [showResourceModal, setShowResourceModal] = useState(false)
+  const [editingLecture, setEditingLecture] = useState(null)
+  const [editingResource, setEditingResource] = useState(null)
   const [savingLecture, setSavingLecture] = useState(false)
   const [savingResource, setSavingResource] = useState(false)
   const [lectureForm, setLectureForm] = useState({
@@ -89,6 +91,7 @@ export default function CourseDetail() {
   }
 
   const openLectureModal = () => {
+    setEditingLecture(null)
     setLectureForm({
       title: '',
       description: '',
@@ -99,7 +102,25 @@ export default function CourseDetail() {
     setShowLectureModal(true)
   }
 
+  const openEditLectureModal = (lecture) => {
+    setEditingLecture(lecture)
+    setLectureForm({
+      title: lecture.title || '',
+      description: lecture.description || '',
+      videoUrl: lecture.videoUrl || '',
+      order: lecture.order || 1,
+      isPreview: Boolean(lecture.isPreview)
+    })
+    setShowLectureModal(true)
+  }
+
+  const closeLectureModal = () => {
+    setShowLectureModal(false)
+    setEditingLecture(null)
+  }
+
   const openResourceModal = () => {
+    setEditingResource(null)
     setResourceForm({
       name: '',
       type: 'notes',
@@ -109,19 +130,40 @@ export default function CourseDetail() {
     setShowResourceModal(true)
   }
 
+  const openEditResourceModal = (resource) => {
+    setEditingResource(resource)
+    setResourceForm({
+      name: resource.name || '',
+      type: resource.type || 'notes',
+      fileUrl: resource.fileUrl || '',
+      lectureId: resource.lectureId?._id || resource.lectureId || ''
+    })
+    setShowResourceModal(true)
+  }
+
+  const closeResourceModal = () => {
+    setShowResourceModal(false)
+    setEditingResource(null)
+  }
+
   const submitLecture = async (event) => {
     event.preventDefault()
     setSavingLecture(true)
     try {
-      await lectureAPI.createLecture({
+      const payload = {
         ...lectureForm,
         courseId: id,
         order: Number(lectureForm.order) || lectures.length + 1
-      })
-      setShowLectureModal(false)
+      }
+      if (editingLecture) {
+        await lectureAPI.updateLecture(editingLecture._id, payload)
+      } else {
+        await lectureAPI.createLecture(payload)
+      }
+      closeLectureModal()
       await loadCourseData()
     } catch (err) {
-      alert(err.message || 'Failed to create lecture')
+      alert(err.message || 'Failed to save lecture')
     } finally {
       setSavingLecture(false)
     }
@@ -131,17 +173,42 @@ export default function CourseDetail() {
     event.preventDefault()
     setSavingResource(true)
     try {
-      await resourceAPI.createResource({
+      const payload = {
         ...resourceForm,
         courseId: id,
         lectureId: resourceForm.lectureId || null
-      })
-      setShowResourceModal(false)
+      }
+      if (editingResource) {
+        await resourceAPI.updateResource(editingResource._id, payload)
+      } else {
+        await resourceAPI.createResource(payload)
+      }
+      closeResourceModal()
       await loadCourseData()
     } catch (err) {
-      alert(err.message || 'Failed to create resource')
+      alert(err.message || 'Failed to save resource')
     } finally {
       setSavingResource(false)
+    }
+  }
+
+  const handleResourceDelete = async (resource) => {
+    if (!window.confirm(`Delete "${resource.name}"?`)) return
+    try {
+      await resourceAPI.deleteResource(resource._id)
+      await loadCourseData()
+    } catch (err) {
+      alert(err.message || 'Failed to delete resource')
+    }
+  }
+
+  const handleLectureDelete = async (lecture) => {
+    if (!window.confirm(`Delete lecture "${lecture.title}"?`)) return
+    try {
+      await lectureAPI.deleteLecture(lecture._id)
+      await loadCourseData()
+    } catch (err) {
+      alert(err.message || 'Failed to delete lecture')
     }
   }
 
@@ -206,22 +273,43 @@ export default function CourseDetail() {
             ) : (
               <div className={styles.lectureList}>
                 {lectures.map((lecture, index) => (
-                  <Link
-                    key={lecture._id}
-                    to={`/courses/${id}/lectures/${lecture._id}`}
-                    className={styles.lectureItem}
-                  >
-                    <span className={styles.lectureNumber}>{index + 1}</span>
-                    <div className={styles.lectureInfo}>
-                      <h4>{lecture.title}</h4>
-                      <div className={styles.lectureMeta}>
-                        {lecture.duration > 0 && (
-                          <span className={styles.duration}>{lecture.duration} min</span>
-                        )}
-                        {lecture.isPreview && <span className={styles.preview}>Preview</span>}
+                  <div key={lecture._id} className={styles.lectureItem}>
+                    <Link
+                      to={`/courses/${id}/lectures/${lecture._id}`}
+                      className={styles.lectureLink}
+                    >
+                      <span className={styles.lectureNumber}>{index + 1}</span>
+                      <div className={styles.lectureInfo}>
+                        <h4>{lecture.title}</h4>
+                        <div className={styles.lectureMeta}>
+                          {lecture.duration > 0 && (
+                            <span className={styles.duration}>{lecture.duration} min</span>
+                          )}
+                          {lecture.isPreview && <span className={styles.preview}>Preview</span>}
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                    {user?.isAdmin && (
+                      <div className={styles.inlineActions}>
+                        <button
+                          type="button"
+                          className={styles.iconBtn}
+                          aria-label="Edit lecture"
+                          onClick={() => openEditLectureModal(lecture)}
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.iconBtn} ${styles.delete}`}
+                          aria-label="Delete lecture"
+                          onClick={() => handleLectureDelete(lecture)}
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -241,15 +329,34 @@ export default function CourseDetail() {
             ) : (
               <div className={styles.resourceList}>
                 {resources.map((resource) => (
-                  <a
-                    key={resource._id}
-                    href={resource.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.resourceItem}
-                  >
-                    {resource.name} ({resource.type})
-                  </a>
+                  <div key={resource._id} className={styles.resourceItemWrapper}>
+                    <a
+                      href={resource.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.resourceItem}
+                    >
+                      {resource.name} ({resource.type})
+                    </a>
+                    {user?.isAdmin && (
+                      <div className={styles.resourceActions}>
+                        <button
+                          type="button"
+                          className={styles.resourceActionBtn}
+                          onClick={() => openEditResourceModal(resource)}
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          type="button"
+                          className={`${styles.resourceActionBtn} ${styles.delete}`}
+                          onClick={() => handleResourceDelete(resource)}
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -322,11 +429,11 @@ export default function CourseDetail() {
       </div>
 
       {showLectureModal && (
-        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setShowLectureModal(false)}>
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && closeLectureModal()}>
           <div className={styles.modalPanel}>
             <div className={styles.modalHeader}>
-              <h2>Add Lecture</h2>
-              <button onClick={() => setShowLectureModal(false)} type="button">×</button>
+              <h2>{editingLecture ? 'Edit Lecture' : 'Add Lecture'}</h2>
+              <button onClick={closeLectureModal} type="button">×</button>
             </div>
             <form className={styles.modalForm} onSubmit={submitLecture}>
               <label>
@@ -374,11 +481,11 @@ export default function CourseDetail() {
                 Mark as preview
               </label>
               <div className={styles.modalActions}>
-                <button type="button" onClick={() => setShowLectureModal(false)} className={styles.cancelBtn}>
+                <button type="button" onClick={closeLectureModal} className={styles.cancelBtn}>
                   Cancel
                 </button>
                 <button type="submit" className={styles.saveBtn} disabled={savingLecture}>
-                  {savingLecture ? 'Saving…' : 'Save Lecture'}
+                  {savingLecture ? 'Saving…' : editingLecture ? 'Update Lecture' : 'Save Lecture'}
                 </button>
               </div>
             </form>
@@ -387,11 +494,11 @@ export default function CourseDetail() {
       )}
 
       {showResourceModal && (
-        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && setShowResourceModal(false)}>
+        <div className={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && closeResourceModal()}>
           <div className={styles.modalPanel}>
             <div className={styles.modalHeader}>
-              <h2>Add Resource</h2>
-              <button onClick={() => setShowResourceModal(false)} type="button">×</button>
+              <h2>{editingResource ? 'Edit Resource' : 'Add Resource'}</h2>
+              <button onClick={closeResourceModal} type="button">×</button>
             </div>
             <form className={styles.modalForm} onSubmit={submitResource}>
               <label>
@@ -437,11 +544,11 @@ export default function CourseDetail() {
                 </select>
               </label>
               <div className={styles.modalActions}>
-                <button type="button" onClick={() => setShowResourceModal(false)} className={styles.cancelBtn}>
+                <button type="button" onClick={closeResourceModal} className={styles.cancelBtn}>
                   Cancel
                 </button>
                 <button type="submit" className={styles.saveBtn} disabled={savingResource}>
-                  {savingResource ? 'Saving…' : 'Save Resource'}
+                  {savingResource ? 'Saving…' : editingResource ? 'Update Resource' : 'Save Resource'}
                 </button>
               </div>
             </form>

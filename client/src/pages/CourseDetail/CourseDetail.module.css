@@ -125,6 +125,46 @@
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+.lectureLink {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-lg);
+  text-decoration: none;
+  color: var(--gray-700);
+}
+
+.inlineActions {
+  display: inline-flex;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  font-size: 1rem;
+}
+
+.iconBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.iconBtn.delete {
+  background: var(--error-light);
+  color: var(--error);
+}
+
 .lectureItem:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
@@ -183,6 +223,15 @@
   gap: var(--spacing-sm);
 }
 
+.resourceItemWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: rgba(255, 122, 26, 0.08);
+  padding: 0.35rem 0.35rem 0.35rem 0;
+  border-radius: var(--radius-full);
+}
+
 .resourceItem {
   display: inline-flex;
   align-items: center;
@@ -198,6 +247,38 @@
 
 .resourceItem:hover {
   background: rgba(255, 122, 26, 0.22);
+}
+
+.resourceActions {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+.resourceActionBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: white;
+  color: var(--gray-700);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resourceActionBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.resourceActionBtn.delete {
+  background: var(--error-light);
+  color: var(--error);
 }
 
 .ratingsList {

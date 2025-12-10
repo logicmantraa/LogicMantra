@@ -11,6 +11,11 @@ const resourceSchema = new mongoose.Schema({
     ref: 'Course',
     required: true
   },
+  description: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   name: {
     type: String,
     required: true,
@@ -18,8 +23,9 @@ const resourceSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['notes', 'practice'],
-    required: true
+    enum: ['notes', 'practice', 'pdf', 'sheet', 'link', 'other'],
+    required: true,
+    default: 'notes'
   },
   fileUrl: {
     type: String,

@@ -15,7 +15,7 @@ export default function AdminResources() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    type: 'pdf',
+    type: 'notes',
     fileUrl: ''
   })
 
@@ -46,9 +46,7 @@ export default function AdminResources() {
     try {
       const lectureData = await lectureAPI.getLectures(courseId)
       setLectures(lectureData)
-      if (lectureData.length > 0) {
-        setSelectedLecture(lectureData[0]._id)
-      }
+      setSelectedLecture(lectureData.length > 0 ? lectureData[0]._id : '')
     } catch (err) {
       console.error('Failed to load lectures:', err)
     }
@@ -56,7 +54,11 @@ export default function AdminResources() {
 
   const loadResources = async (courseId, lectureId) => {
     try {
-      const data = await resourceAPI.getResources({ courseId, lectureId })
+      const params = { courseId }
+      if (lectureId) {
+        params.lectureId = lectureId
+      }
+      const data = await resourceAPI.getResources(params)
       setResources(data)
     } catch (err) {
       console.error('Failed to load resources:', err)
@@ -66,14 +68,19 @@ export default function AdminResources() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      const payload = {
+        ...formData,
+        courseId: selectedCourse,
+        lectureId: selectedLecture || null
+      }
       if (editingResource) {
-        await resourceAPI.updateResource(editingResource._id, { ...formData, courseId: selectedCourse, lectureId: selectedLecture })
+        await resourceAPI.updateResource(editingResource._id, payload)
       } else {
-        await resourceAPI.createResource({ ...formData, courseId: selectedCourse, lectureId: selectedLecture })
+        await resourceAPI.createResource(payload)
       }
       setShowForm(false)
       setEditingResource(null)
-      setFormData({ name: '', description: '', type: 'pdf', fileUrl: '' })
+      setFormData({ name: '', description: '', type: 'notes', fileUrl: '' })
       loadResources(selectedCourse, selectedLecture)
     } catch (err) {
       alert(err.message || 'Failed to save resource')
@@ -88,6 +95,7 @@ export default function AdminResources() {
       type: resource.type,
       fileUrl: resource.fileUrl
     })
+    setSelectedLecture(resource.lectureId?._id || resource.lectureId || '')
     setShowForm(true)
   }
 
@@ -165,6 +173,8 @@ export default function AdminResources() {
                 <div className={styles.formGroup}>
                   <label>Type</label>
                   <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })}>
+                    <option value="notes">Notes</option>
+                    <option value="practice">Practice</option>
                     <option value="pdf">PDF</option>
                     <option value="sheet">Practice Sheet</option>
                     <option value="link">External Link</option>
