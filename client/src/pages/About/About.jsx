@@ -120,15 +120,15 @@ export default function About() {
         <div className={styles.timeline}>
           <div className={styles.timelineItem}>
             <span className={styles.timelineYear}>2018</span>
-            <p>Founded with 30 learners and weekend knowledge sessions.</p>
+            <p className={styles.timelineItemText}>Founded with 30 learners and weekend knowledge sessions.</p>
           </div>
           <div className={styles.timelineItem}>
             <span className={styles.timelineYear}>2020</span>
-            <p>Launched our digital platform, welcoming remote learners worldwide.</p>
+            <p className={styles.timelineItemText}>Launched our digital platform, welcoming remote learners worldwide.</p>
           </div>
           <div className={styles.timelineItem}>
             <span className={styles.timelineYear}>2023</span>
-            <p>Introduced AI-assisted practice labs and mentor-led cohorts.</p>
+            <p className={styles.timelineItemText}>Introduced AI-assisted practice labs and mentor-led cohorts.</p>
           </div>
         </div>
       </section>
@@ -221,11 +221,12 @@ export default function About() {
         <div className={styles.mapCard}>
           <h2>Where You’ll Find Us</h2>
           <p>
-            91/4 Knowledge Park, Bengaluru, India · <a href="mailto:hello@logicmantraa.com">hello@logicmantraa.com</a>
+            {/* 3rd floor, Gurunanak Plaza, Kota, Rajasthan, India ·  */}
+            Mail us at <a href="mailto:logicmantraa@gmail.com">logicmantraa@gmail.com</a>
           </p>
-          <div className={styles.mapPlaceholder}>
+          {/* <div className={styles.mapPlaceholder}>
             Interactive map & campus walkthrough coming soon.
-          </div>
+          </div> */}
         </div>
       </section>
     </PageShell>

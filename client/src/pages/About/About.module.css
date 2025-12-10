@@ -160,23 +160,31 @@
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-md);
-  position: relative;
-  padding-left: var(--spacing-2xl);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
   font-size: clamp(0.95rem, 1.9vw, 1.05rem);
 }
 
 .timelineYear {
-  position: absolute;
-  left: var(--spacing-lg);
-  top: var(--spacing-lg);
   font-weight: 700;
   color: var(--secondary-600);
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  flex-shrink: 0;
+  min-width: 60px;
 }
 
 .timelineItem p {
   margin: 0;
   color: var(--gray-600);
   line-height: 1.6;
+}
+
+.timelineItemText {
+  margin: 0;
+  color: var(--gray-600);
+  line-height: 1.6;
+  flex: 1;
 }
 
 .contactSection {
@@ -410,7 +418,11 @@
   }
 
   .timelineItem {
-    padding-left: var(--spacing-xl);
+    gap: var(--spacing-sm);
+  }
+  
+  .timelineYear {
+    min-width: 50px;
   }
 }
 
@@ -500,12 +512,12 @@
   }
 
   .timelineItem {
-    padding-left: var(--spacing-lg);
+    flex-direction: column;
+    gap: var(--spacing-xs);
   }
 
   .timelineYear {
-    position: static;
-    margin-bottom: var(--spacing-xs);
+    min-width: auto;
   }
 
   .mapPlaceholder {
