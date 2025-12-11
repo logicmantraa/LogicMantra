@@ -1,0 +1,227 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.clearBtn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--error);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background var(--transition-fast);
+}
+
+.clearBtn:hover {
+  background: var(--error-dark, #dc2626);
+}
+
+.loading,
+.error,
+.emptyCart {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--gray-600);
+}
+
+.emptyCart h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--gray-900);
+}
+
+.emptyCart p {
+  margin-bottom: var(--spacing-lg);
+}
+
+.browseBtn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--primary-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.browseBtn:hover {
+  background: var(--primary-600);
+}
+
+.errorMsg {
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-lg);
+}
+
+.cartContent {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: var(--spacing-xl);
+}
+
+.itemsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.cartItem {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+}
+
+.itemImage {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--gray-100);
+}
+
+.itemDetails {
+  flex: 1;
+}
+
+.itemDetails h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: var(--spacing-xs);
+}
+
+.itemType {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  margin-bottom: var(--spacing-sm);
+}
+
+.itemPrice {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+.removeBtn {
+  align-self: flex-start;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  color: var(--error);
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.removeBtn:hover {
+  background: var(--error);
+  color: white;
+}
+
+.summarySection {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.summaryBox {
+  padding: var(--spacing-xl);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
+}
+
+.summaryBox h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  color: var(--gray-900);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.summaryRow:last-of-type {
+  border-bottom: none;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-lg);
+  border-top: 2px solid var(--gray-300);
+}
+
+.summaryRow strong {
+  font-size: 1.25rem;
+  color: var(--gray-900);
+}
+
+.checkoutBtn {
+  width: 100%;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--primary-500);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.checkoutBtn:hover:not(:disabled) {
+  background: var(--primary-600);
+}
+
+.checkoutBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .cartContent {
+    grid-template-columns: 1fr;
+  }
+
+  .summarySection {
+    position: static;
+  }
+
+  .cartItem {
+    flex-direction: column;
+  }
+
+  .itemImage {
+    width: 100%;
+    height: 200px;
+  }
+}
+

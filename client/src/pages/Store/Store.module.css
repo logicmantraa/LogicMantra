@@ -215,21 +215,57 @@
   color: var(--secondary-600);
 }
 
-.purchaseBtn {
-  background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
-  color: white;
+.actionButtons {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.addToCartBtn,
+.buyNowBtn {
   border: none;
-  padding: var(--spacing-sm) var(--spacing-xl);
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-full);
   cursor: pointer;
   font-weight: 600;
-  box-shadow: var(--shadow-md);
+  font-size: 0.875rem;
   transition: all var(--transition-fast);
 }
 
-.purchaseBtn:hover {
+.addToCartBtn {
+  background: transparent;
+  color: var(--secondary-600);
+  border: 2px solid var(--secondary-600);
+}
+
+.addToCartBtn:hover:not(:disabled) {
+  background: var(--secondary-50);
+}
+
+.buyNowBtn {
+  background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.buyNowBtn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+}
+
+.addToCartBtn:disabled,
+.buyNowBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ownedBadge {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .modalOverlay {
@@ -381,4 +417,5 @@
     padding: var(--spacing-lg);
   }
 }
+
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { courseAPI, enrollmentAPI, ratingAPI, lectureAPI, resourceAPI } from '../../utils/api'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { courseAPI, enrollmentAPI, ratingAPI, lectureAPI, resourceAPI, cartAPI, paymentAPI } from '../../utils/api'
 import { useAuth } from '../../context/AuthContext'
+import { handleRazorpayPayment } from '../../utils/payment'
 import PageShell from '../../components/Layout/PageShell'
 import Rating from '../../components/Rating/Rating'
 import styles from './CourseDetail.module.css'
@@ -9,6 +10,7 @@ import styles from './CourseDetail.module.css'
 export default function CourseDetail() {
   const { id } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [course, setCourse] = useState(null)
   const [lectures, setLectures] = useState([])
   const [resources, setResources] = useState([])
@@ -16,6 +18,7 @@ export default function CourseDetail() {
   const [enrolled, setEnrolled] = useState(false)
   const [loading, setLoading] = useState(true)
   const [enrolling, setEnrolling] = useState(false)
+  const [processing, setProcessing] = useState(false)
   const [showLectureModal, setShowLectureModal] = useState(false)
   const [showResourceModal, setShowResourceModal] = useState(false)
   const [editingLecture, setEditingLecture] = useState(null)
@@ -70,10 +73,17 @@ export default function CourseDetail() {
 
   const handleEnroll = async () => {
     if (!user) {
-      alert('Please login to enroll')
+      navigate('/login')
       return
     }
 
+    // If course is paid, handle payment flow
+    if (course && !course.isFree && course.price > 0) {
+      handlePurchaseCourse()
+      return
+    }
+
+    // For free courses, enroll directly
     setEnrolling(true)
     try {
       await enrollmentAPI.enroll(id)
@@ -83,6 +93,62 @@ export default function CourseDetail() {
       alert(err.message || 'Failed to enroll')
     } finally {
       setEnrolling(false)
+    }
+  }
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    try {
+      await cartAPI.addItem('course', id)
+      alert('Course added to cart!')
+    } catch (err) {
+      alert(err.message || 'Failed to add course to cart')
+    }
+  }
+
+  const handlePurchaseCourse = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    setProcessing(true)
+
+    try {
+      // Create direct order
+      const orderData = await paymentAPI.createDirectOrder('course', id)
+
+      // If free course, redirect to success
+      if (orderData.isFree) {
+        setEnrolled(true)
+        navigate('/payment/success', {
+          state: { order: orderData.order, isFree: true, courseId: id }
+        })
+        return
+      }
+
+      // Handle Razorpay payment
+      const result = await handleRazorpayPayment(orderData)
+
+      if (result.success) {
+        setEnrolled(true)
+        navigate('/payment/success', {
+          state: { order: result.verification.order, verification: result.verification, courseId: id }
+        })
+      }
+    } catch (err) {
+      console.error('Purchase error:', err)
+      if (err.message !== 'Payment cancelled by user') {
+        navigate('/payment/failure', {
+          state: { error: err.message || 'Payment failed' }
+        })
+      }
+    } finally {
+      setProcessing(false)
     }
   }
 
@@ -406,11 +472,27 @@ export default function CourseDetail() {
             ) : (
               <div>
                 <h3>{course.isFree ? 'Free Course' : `₹${course.price}`}</h3>
-                <button onClick={handleEnroll} disabled={enrolling} className={styles.enrollBtn}>
-                  {enrolling ? 'Enrolling...' : 'Enroll Now'}
-                </button>
-                {!course.isFree && (
-                  <p className={styles.note}>Payment integration coming soon</p>
+                {course.isFree ? (
+                  <button onClick={handleEnroll} disabled={enrolling} className={styles.enrollBtn}>
+                    {enrolling ? 'Enrolling...' : 'Enroll Now'}
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handlePurchaseCourse}
+                      disabled={processing || enrolling}
+                      className={styles.enrollBtn}
+                    >
+                      {processing ? 'Processing...' : 'Purchase & Enroll'}
+                    </button>
+                    <button
+                      onClick={handleAddToCart}
+                      className={styles.addToCartBtn}
+                      disabled={processing}
+                    >
+                      Add to Cart
+                    </button>
+                  </>
                 )}
               </div>
             )}

@@ -10,6 +10,9 @@ import LectureViewer from "./pages/LectureViewer/LectureViewer";
 import Profile from "./pages/Profile/Profile";
 import MyCourses from "./pages/MyCourses/MyCourses";
 import Store from "./pages/Store/Store";
+import Cart from "./pages/Cart/Cart";
+import PaymentSuccess from "./pages/PaymentSuccess/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure/PaymentFailure";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import AdminCourses from "./pages/Admin/Courses/AdminCourses";
 import AdminLectures from "./pages/Admin/Lectures/AdminLectures";
@@ -82,6 +85,30 @@ function App() {
           element={
             <ProtectedRoute>
               <Store />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment/success"
+          element={
+            <ProtectedRoute>
+              <PaymentSuccess />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment/failure"
+          element={
+            <ProtectedRoute>
+              <PaymentFailure />
             </ProtectedRoute>
           }
         />

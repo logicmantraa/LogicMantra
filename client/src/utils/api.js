@@ -115,6 +115,7 @@ export const storeAPI = {
     return apiRequest(`/store${queryString ? `?${queryString}` : ''}`);
   },
   getStoreItemById: (id) => apiRequest(`/store/${id}`),
+  getMyPurchases: () => apiRequest('/store/my-purchases'),
   createStoreItem: (itemData) => apiRequest('/store', {
     method: 'POST',
     body: itemData,
@@ -126,9 +127,39 @@ export const storeAPI = {
   deleteStoreItem: (id) => apiRequest(`/store/${id}`, {
     method: 'DELETE',
   }),
-  purchaseItem: (id) => apiRequest(`/store/${id}/purchase`, {
+};
+
+// Cart API
+export const cartAPI = {
+  getCart: () => apiRequest('/cart'),
+  addItem: (itemType, itemId) => apiRequest('/cart/add-item', {
+    method: 'POST',
+    body: { itemType, itemId },
+  }),
+  removeItem: (cartItemId) => apiRequest(`/cart/remove-item/${cartItemId}`, {
+    method: 'DELETE',
+  }),
+  clearCart: () => apiRequest('/cart', {
+    method: 'DELETE',
+  }),
+  getTotal: () => apiRequest('/cart/total'),
+};
+
+// Payment API
+export const paymentAPI = {
+  createOrder: () => apiRequest('/payments/create-order', {
     method: 'POST',
   }),
+  createDirectOrder: (itemType, itemId) => apiRequest('/payments/create-direct-order', {
+    method: 'POST',
+    body: { itemType, itemId },
+  }),
+  verifyPayment: (paymentData) => apiRequest('/payments/verify-payment', {
+    method: 'POST',
+    body: paymentData,
+  }),
+  getMyOrders: () => apiRequest('/payments/my-orders'),
+  getOrderById: (orderId) => apiRequest(`/payments/order/${orderId}`),
 };
 
 // User API (Admin)
