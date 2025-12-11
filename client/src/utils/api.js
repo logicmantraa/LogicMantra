@@ -156,7 +156,7 @@ export const lectureAPI = {
   createLecture: (courseIdOrData, lectureData) => {
     const payload = lectureData ? { ...lectureData, courseId: courseIdOrData } : courseIdOrData;
     return apiRequest('/lectures', {
-      method: 'POST',
+    method: 'POST',
       body: payload,
     });
   },
@@ -164,14 +164,14 @@ export const lectureAPI = {
     const id = maybeData ? lectureIdOrData : lectureIdOrCourseId;
     const payload = maybeData || lectureIdOrData;
     return apiRequest(`/lectures/${id}`, {
-      method: 'PUT',
+    method: 'PUT',
       body: payload,
     });
   },
   deleteLecture: (lectureIdOrCourseId, maybeLectureId) => {
     const id = maybeLectureId || lectureIdOrCourseId;
     return apiRequest(`/lectures/${id}`, {
-      method: 'DELETE',
+    method: 'DELETE',
     });
   },
 };

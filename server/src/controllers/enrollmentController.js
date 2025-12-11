@@ -1,6 +1,7 @@
 import Enrollment from '../models/Enrollment.js';
 import Course from '../models/Course.js';
 import Lecture from '../models/Lecture.js';
+import { checkUserOwnership } from '../utils/purchaseHelpers.js';
 
 // @desc    Enroll in a course
 // @route   POST /api/enrollments
@@ -25,9 +26,21 @@ export const enrollInCourse = async (req, res) => {
       throw new Error('Already enrolled in this course');
     }
     
+    // For paid courses, check if user has purchased it
+    if (!course.isFree && course.price > 0) {
+      const ownsCourse = await checkUserOwnership(userId, courseId, 'course');
+      if (!ownsCourse) {
+        res.status(403);
+        throw new Error('This is a paid course. Please purchase it first to enroll.');
+      }
+    }
+    
+    // Create enrollment
     const enrollment = await Enrollment.create({
       userId,
-      courseId
+      courseId,
+      isPaid: !course.isFree && course.price > 0,
+      purchasedAt: !course.isFree && course.price > 0 ? new Date() : null
     });
     
     // Update course enrollment count

@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema({
   subscriptionExpiresAt: {
     type: Date,
     default: null
+  },
+  // Purchase statistics (optional, for quick access)
+  purchaseCount: {
+    type: Number,
+    default: 0
+  },
+  lastPurchaseAt: {
+    type: Date,
+    default: null
   }
 }, { timestamps: true });
 

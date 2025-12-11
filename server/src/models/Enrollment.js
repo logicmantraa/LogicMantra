@@ -24,7 +24,21 @@ const enrollmentSchema = new mongoose.Schema({
   completedLectures: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lecture'
-  }]
+  }],
+  // Payment-related fields
+  orderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order',
+    default: null
+  },
+  isPaid: {
+    type: Boolean,
+    default: false
+  },
+  purchasedAt: {
+    type: Date,
+    default: null
+  }
 }, { timestamps: true });
 
 // Ensure one enrollment per user per course

@@ -420,7 +420,7 @@ export default function CourseDetail() {
             <h4>Course Highlights</h4>
             <ul>
               <li>{lectures.length} video lectures</li>
-              <li>{resources.length} downloadable resources</li>
+              <li>{resources.length} resources</li>
               <li>Lifetime access & updates</li>
               <li>Certificate of completion</li>
             </ul>

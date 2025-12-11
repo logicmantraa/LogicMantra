@@ -14,6 +14,8 @@ import ratingRoutes from './routes/rating.js';
 import storeRoutes from './routes/store.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
+import cartRoutes from './routes/cart.js';
+import paymentRoutes from './routes/payment.js';
 
 // Import middleware
 import { errorHandler, notFound } from './middleware/errorHandler.js';
@@ -64,6 +66,8 @@ app.use('/api/ratings', ratingRoutes);
 app.use('/api/store', storeRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Base route
 app.get('/', (req, res) => {
