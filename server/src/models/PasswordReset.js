@@ -1,36 +1,25 @@
 import mongoose from 'mongoose';
 
-const passwordResetSchema = new mongoose.Schema({
+const passwordResetSchema = mongoose.Schema({
   email: {
     type: String,
     required: true,
-    lowercase: true,
-    trim: true,
-    index: true
   },
   otp: {
     type: String,
-    required: true
+    required: true,
   },
-  expiresAt: {
+  otpExpires: {
     type: Date,
     required: true,
-    index: { expireAfterSeconds: 0 } // Auto-delete expired documents
   },
-  verified: {
-    type: Boolean,
-    default: false
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 600, // Document expires after 10 minutes
   },
-  attempts: {
-    type: Number,
-    default: 0
-  }
-}, { timestamps: true });
-
-// Index for faster lookups
-passwordResetSchema.index({ email: 1, verified: 1 });
+});
 
 const PasswordReset = mongoose.model('PasswordReset', passwordResetSchema);
 
 export default PasswordReset;
-

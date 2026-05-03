@@ -1,6 +1,5 @@
 import StoreItem from '../models/StoreItem.js';
 import User from '../models/User.js';
-import { checkMultipleOwnership, getUserPurchases, checkUserOwnership } from '../utils/purchaseHelpers.js';
 
 // @desc    Get all store items
 // @route   GET /api/store
@@ -8,7 +7,6 @@ import { checkMultipleOwnership, getUserPurchases, checkUserOwnership } from '..
 export const getStoreItems = async (req, res) => {
   try {
     const { search, category, type } = req.query;
-    const userId = req.user?._id; // Optional: user might not be authenticated
     
     const query = {};
     
@@ -24,22 +22,6 @@ export const getStoreItems = async (req, res) => {
     
     const items = await StoreItem.find(query).sort({ createdAt: -1 });
     
-    // Add ownership status if user is authenticated
-    if (userId) {
-      const itemIds = items.map(item => item._id.toString());
-      const ownershipMap = await checkMultipleOwnership(
-        userId,
-        itemIds.map(id => ({ itemId: id, itemType: 'storeItem' }))
-      );
-      
-      const itemsWithOwnership = items.map(item => ({
-        ...item.toObject(),
-        isOwned: ownershipMap[item._id.toString()] || false
-      }));
-      
-      return res.json(itemsWithOwnership);
-    }
-    
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -51,7 +33,6 @@ export const getStoreItems = async (req, res) => {
 // @access  Public
 export const getStoreItemById = async (req, res) => {
   try {
-    const userId = req.user?._id;
     const item = await StoreItem.findById(req.params.id);
     
     if (!item) {
@@ -59,14 +40,7 @@ export const getStoreItemById = async (req, res) => {
       throw new Error('Store item not found');
     }
     
-    const itemData = item.toObject();
-    
-    // Add ownership status if user is authenticated
-    if (userId) {
-      itemData.isOwned = await checkUserOwnership(userId, item._id.toString(), 'storeItem');
-    }
-    
-    res.json(itemData);
+    res.json(item);
   } catch (error) {
     res.status(res.statusCode === 200 ? 500 : res.statusCode);
     res.json({ message: error.message });
@@ -127,32 +101,27 @@ export const deleteStoreItem = async (req, res) => {
   }
 };
 
-// @desc    Get user's purchased store items
-// @route   GET /api/store/my-purchases
+// @desc    Purchase store item (track purchase - no payment for now)
+// @route   POST /api/store/:id/purchase
 // @access  Private
-export const getMyPurchases = async (req, res) => {
+export const purchaseStoreItem = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const item = await StoreItem.findById(req.params.id);
     
-    const purchases = await getUserPurchases(userId, 'storeItem');
+    if (!item) {
+      res.status(404);
+      throw new Error('Store item not found');
+    }
     
-    // Populate item details
-    const itemsWithDetails = await Promise.all(
-      purchases.map(async (purchase) => {
-        const item = await StoreItem.findById(purchase.itemId);
-        return {
-          purchase: {
-            purchasedAt: purchase.purchasedAt,
-            orderId: purchase.orderId
-          },
-          item: item
-        };
-      })
-    );
-    
-    res.json(itemsWithDetails);
+    // For now, just return success (payment integration in future)
+    // In future, add purchases array to User model or create Purchase model
+    res.json({
+      message: 'Purchase successful (payment integration coming soon)',
+      item
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(res.statusCode === 200 ? 500 : res.statusCode);
+    res.json({ message: error.message });
   }
 };
 

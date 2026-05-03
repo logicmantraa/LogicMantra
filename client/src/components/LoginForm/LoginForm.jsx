@@ -48,7 +48,10 @@ export default function LoginForm() {
         <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        <p>Don't have an account? <Link to="/signup">Signup</Link></p>
+        <div className={styles.extraLinks}>
+          <p>Don't have an account? <Link to="/signup">Signup</Link></p>
+          <p><Link to="/forgot-password">Forgot Password?</Link></p>
+        </div>
       </form>
     </div>
   )

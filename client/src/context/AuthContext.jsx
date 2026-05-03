@@ -63,6 +63,17 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const data = await authAPI.register({ name, email, password, phoneNumber });
+      return data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const verifyOTP = async (email, otp) => {
+    try {
+      setError(null);
+      const data = await authAPI.verifyOTP({ email, otp });
       if (data.token) {
         localStorage.setItem('token', data.token);
         setUser({
@@ -73,6 +84,39 @@ export const AuthProvider = ({ children }) => {
           isAdmin: data.isAdmin,
         });
       }
+      return data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const resendOTP = async (email) => {
+    try {
+      setError(null);
+      const data = await authAPI.resendOTP(email);
+      return data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      setError(null);
+      const data = await authAPI.forgotPassword(email);
+      return data;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    try {
+      setError(null);
+      const data = await authAPI.resetPassword({ email, otp, newPassword });
       return data;
     } catch (err) {
       setError(err.message);
@@ -127,6 +171,10 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     register,
+    verifyOTP,
+    resendOTP,
+    forgotPassword,
+    resetPassword,
     logout,
     updateProfile,
     updatePassword,

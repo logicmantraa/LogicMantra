@@ -34,23 +34,35 @@
   font-size: 0.875rem;
 }
 
+.success {
+  background-color: var(--success-light);
+  color: var(--success);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+}
+
 form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
 }
 
-input {
+.otpInput {
   padding: var(--spacing-md);
+  font-size: 2rem;
+  text-align: center;
+  letter-spacing: 0.5rem;
   border: 2px solid var(--gray-200);
   border-radius: var(--radius);
-  font-size: 1rem;
+  outline: none;
   transition: all var(--transition-fast);
   font-family: inherit;
+  font-weight: 700;
 }
 
-input:focus {
-  outline: none;
+.otpInput:focus {
   border-color: var(--primary-500);
   box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.1);
 }
@@ -77,19 +89,35 @@ button:hover:not(:disabled) {
 button:disabled {
   background: var(--gray-300);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.links {
-  margin-top: var(--spacing-xl);
+.resendContainer {
+  margin-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--gray-100);
 }
 
-.links a {
-  color: var(--primary-600);
-  text-decoration: none;
+.resendContainer p {
+  margin-bottom: var(--spacing-xs);
   font-size: 0.875rem;
-  font-weight: 500;
+  color: var(--gray-500);
 }
 
-.links a:hover {
+.resendButton {
+  background: none;
+  color: var(--primary-600);
+  font-size: 0.875rem;
+  padding: var(--spacing-xs);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.resendButton:hover:not(:disabled) {
   text-decoration: underline;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.8;
 }

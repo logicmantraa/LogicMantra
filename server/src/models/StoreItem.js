@@ -32,15 +32,6 @@ const storeItemSchema = new mongoose.Schema({
   thumbnail: {
     type: String,
     default: ''
-  },
-  // Analytics fields (optional)
-  purchaseCount: {
-    type: Number,
-    default: 0
-  },
-  lastPurchasedAt: {
-    type: Date,
-    default: null
   }
 }, { timestamps: true });
 

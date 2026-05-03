@@ -5,22 +5,22 @@ import {
   createStoreItem,
   updateStoreItem,
   deleteStoreItem,
-  getMyPurchases
+  purchaseStoreItem
 } from '../controllers/storeController.js';
-import { protect, admin, optionalAuth } from '../middleware/authMiddleware.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .get(optionalAuth, getStoreItems) // Optional auth for ownership check
+  .get(getStoreItems)
   .post(protect, admin, createStoreItem);
 
 router.route('/:id')
-  .get(optionalAuth, getStoreItemById) // Optional auth for ownership check
+  .get(getStoreItemById)
   .put(protect, admin, updateStoreItem)
   .delete(protect, admin, deleteStoreItem);
 
-router.get('/my-purchases', protect, getMyPurchases);
+router.post('/:id/purchase', protect, purchaseStoreItem);
 
 export default router;
 

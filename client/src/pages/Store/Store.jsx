@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { storeAPI, cartAPI, paymentAPI } from '../../utils/api'
-import { handleRazorpayPayment } from '../../utils/payment'
+import { storeAPI } from '../../utils/api'
 import PageShell from '../../components/Layout/PageShell'
 import SearchBar from '../../components/SearchBar/SearchBar'
 import styles from './Store.module.css'
@@ -19,7 +17,6 @@ const initialItemForm = {
 
 export default function Store() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const isAdmin = Boolean(user?.isAdmin)
 
   const [items, setItems] = useState([])
@@ -29,7 +26,6 @@ export default function Store() {
   const [itemForm, setItemForm] = useState(initialItemForm)
   const [editingItem, setEditingItem] = useState(null)
   const [savingItem, setSavingItem] = useState(false)
-  const [processingItem, setProcessingItem] = useState(null)
 
   useEffect(() => {
     loadItems()
@@ -48,63 +44,16 @@ export default function Store() {
     }
   }
 
-  const handleAddToCart = async (itemId) => {
-    if (!user) {
-      navigate('/login')
+  const handlePurchase = async (itemId) => {
+    if (!window.confirm('Purchase this item? (Payment integration coming soon)')) {
       return
     }
 
     try {
-      await cartAPI.addItem('storeItem', itemId)
-      alert('Item added to cart!')
-      // Optionally reload items to show updated state
+      await storeAPI.purchaseItem(itemId)
+      alert('Purchase successful! (Payment integration coming soon)')
     } catch (err) {
-      alert(err.message || 'Failed to add item to cart')
-    }
-  }
-
-  const handleBuyNow = async (item) => {
-    if (!user) {
-      navigate('/login')
-      return
-    }
-
-    if (item.isOwned) {
-      alert('You already own this item!')
-      return
-    }
-
-    setProcessingItem(item._id)
-
-    try {
-      // Create direct order
-      const orderData = await paymentAPI.createDirectOrder('storeItem', item._id)
-
-      // If free item, redirect to success
-      if (orderData.isFree) {
-        navigate('/payment/success', {
-          state: { order: orderData.order, isFree: true }
-        })
-        return
-      }
-
-      // Handle Razorpay payment
-      const result = await handleRazorpayPayment(orderData)
-
-      if (result.success) {
-        navigate('/payment/success', {
-          state: { order: result.verification.order, verification: result.verification }
-        })
-      }
-    } catch (err) {
-      console.error('Purchase error:', err)
-      if (err.message !== 'Payment cancelled by user') {
-        navigate('/payment/failure', {
-          state: { error: err.message || 'Payment failed' }
-        })
-      }
-    } finally {
-      setProcessingItem(null)
+      alert(err.message || 'Failed to purchase')
     }
   }
 
@@ -232,28 +181,9 @@ export default function Store() {
                 </div>
                 <div className={styles.footer}>
                   <span className={styles.price}>₹{item.price}</span>
-                  {item.isOwned ? (
-                    <div className={styles.ownedBadge}>Already Owned</div>
-                  ) : (
-                    <div className={styles.actionButtons}>
-                      <button
-                        onClick={() => handleAddToCart(item._id)}
-                        className={styles.addToCartBtn}
-                        type="button"
-                        disabled={processingItem === item._id}
-                      >
-                        Add to Cart
-                      </button>
-                      <button
-                        onClick={() => handleBuyNow(item)}
-                        className={styles.buyNowBtn}
-                        type="button"
-                        disabled={processingItem === item._id}
-                      >
-                        {processingItem === item._id ? 'Processing...' : 'Buy Now'}
-                      </button>
-                    </div>
-                  )}
+                  <button onClick={() => handlePurchase(item._id)} className={styles.purchaseBtn} type="button">
+                    Purchase
+                  </button>
                 </div>
               </div>
             </div>

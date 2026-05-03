@@ -32,7 +32,7 @@ export default function SignupForm() {
 
     try {
       await register(name, email, password, phoneNumber)
-      navigate('/')
+      navigate(`/verify-otp?email=${encodeURIComponent(email)}`)
     } catch (err) {
       setError(err.message || 'Failed to register')
     } finally {
