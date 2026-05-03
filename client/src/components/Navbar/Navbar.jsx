@@ -7,7 +7,6 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -28,16 +27,10 @@ export default function Navbar() {
 
   const toggleMobileMenu = () => {
     setMobileOpen((prev) => !prev);
-    if (adminMenuOpen) setAdminMenuOpen(false);
-  };
-
-  const toggleAdminMenu = () => {
-    setAdminMenuOpen((prev) => !prev);
   };
 
   const closeMenus = () => {
     setMobileOpen(false);
-    setAdminMenuOpen(false);
   };
 
   return (
@@ -50,97 +43,89 @@ export default function Navbar() {
           <span className={styles.logoText}>Logic Mantraa</span>
         </Link>
 
-        <button
-          className={`${styles.menuToggle} ${mobileOpen ? styles.active : ""}`}
-          onClick={toggleMobileMenu}
-          aria-label="Toggle navigation"
-          aria-expanded={mobileOpen}
-          type="button"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        <div className={styles.navActions}>
+          {user ? (
+            <div className={styles.userProfile}>
+              <span className={styles.userName}>{user.name}</span>
+            </div>
+          ) : (
+            <Link to="/login" className={styles.loginLink}>Login</Link>
+          )}
+
+          <button
+            className={`${styles.menuToggle} ${mobileOpen ? styles.active : ""}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle navigation"
+            aria-expanded={mobileOpen}
+            type="button"
+          >
+            <div className={styles.hamburger}>
+              <span />
+              <span />
+              <span />
+            </div>
+            <span className={styles.menuLabel}>Menu</span>
+          </button>
+        </div>
 
         <div
           className={`${styles.navlinks} ${mobileOpen ? styles.open : ""}`}
           role="navigation"
         >
-          <Link to="/courses" onClick={closeMenus}>
-            Courses
-          </Link>
-          <Link to="/my-courses" onClick={closeMenus}>
-            My Courses
-          </Link>
-          {/* <Link to="/store" onClick={closeMenus}>
-            Store
-          </Link> */}
-          <Link to="/about" onClick={closeMenus}>
-            About
-          </Link>
-
-          {user ? (
-            <>
-              <Link to="/profile" onClick={closeMenus}>
-                Profile
+          <div className={styles.menuHeader}>
+            <h3>Navigation</h3>
+          </div>
+          
+          <div className={styles.menuGrid}>
+            <div className={styles.menuSection}>
+              <h4>Explore</h4>
+              <Link to="/courses" onClick={closeMenus}>
+                Courses
               </Link>
+              <Link to="/about" onClick={closeMenus}>
+                About
+              </Link>
+            </div>
 
-              {user.isAdmin && (
-                <div className={styles.adminMenu}>
-                  <button
-                    className={`${styles.adminToggle} ${
-                      adminMenuOpen ? styles.openToggle : ""
-                    }`}
-                    onClick={toggleAdminMenu}
-                    type="button"
-                    aria-expanded={adminMenuOpen}
-                  >
-                    Manage
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 9L12 15L18 9"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                  <div
-                    className={`${styles.adminDropdown} ${
-                      adminMenuOpen ? styles.show : ""
-                    }`}
-                  >
-                    <Link to="/admin/dashboard" onClick={closeMenus}>
-                      Dashboard
-                    </Link>
-                    <Link to="/admin/users" onClick={closeMenus}>
-                      Users
-                    </Link>
-                    <Link to="/admin/contacts" onClick={closeMenus}>
-                      Contacts
-                    </Link>
-                  </div>
-                </div>
-              )}
+            {user && (
+              <div className={styles.menuSection}>
+                <h4>Account</h4>
+                <Link to="/my-courses" onClick={closeMenus}>
+                  My Courses
+                </Link>
+                <Link to="/profile" onClick={closeMenus}>
+                  Profile
+                </Link>
+              </div>
+            )}
 
+            {user?.isAdmin && (
+              <div className={styles.menuSection}>
+                <h4>Administration</h4>
+                <Link to="/admin/dashboard" onClick={closeMenus}>
+                  Dashboard
+                </Link>
+                <Link to="/admin/users" onClick={closeMenus}>
+                  Users
+                </Link>
+                <Link to="/admin/contacts" onClick={closeMenus}>
+                  Contacts
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <div className={styles.menuFooter}>
+            {user ? (
               <button onClick={handleLogout} className={styles.logoutBtn} type="button">
                 Logout
               </button>
-            </>
-          ) : (
-            <div className={styles.authGroup}>
-              <Link to="/login" onClick={closeMenus}>
-                Login
+            ) : (
+              <Link to="/login" onClick={closeMenus} className={styles.footerLogin}>
+                Login / Sign Up
               </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
