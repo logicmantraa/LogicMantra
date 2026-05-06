@@ -1,6 +1,10 @@
 import Enrollment from '../models/Enrollment.js';
 import Course from '../models/Course.js';
 import Lecture from '../models/Lecture.js';
+import AccessService from './AccessService.js';
+import ProductService from './ProductService.js';
+import { AppError, NotFoundError } from '../errors/customErrors.js';
+import logger from '../utils/logger.js';
 
 /**
  * EnrollmentService - Handles all enrollment-related business logic
@@ -28,66 +32,107 @@ class EnrollmentService {
   }
 
   /**
-   * Enroll user in a course
+   * Enroll user in a course (Compatibility layer)
    * @param {string} userId - User ID
    * @param {string} courseId - Course ID
    * @returns {Object} Enrollment result
    */
   static async enrollInCourse(userId, courseId) {
-    // Check if course exists
-    const course = await Course.findById(courseId);
-    if (!course) {
-      throw new Error('Course not found');
+    logger.info(`EnrollmentService.enrollInCourse called for user ${userId}, course ${courseId} - using AccessService`);
+    
+    try {
+      // Try new system first
+      const access = await AccessService.grantAccess(userId, courseId, 'free');
+      
+      // Transform to enrollment format for backward compatibility
+      return {
+        _id: access._id,
+        userId: access.userId,
+        courseId: access.productId,
+        progress: access.progress,
+        completedLectures: access.progressData?.completedLectures || [],
+        enrolledAt: access.addedToLibraryAt,
+        createdAt: access.createdAt,
+        updatedAt: access.updatedAt
+      };
+    } catch (error) {
+      // Fallback to legacy system if AccessService fails
+      logger.warn(`AccessService failed, falling back to legacy Enrollment: ${error.message}`);
+      
+      const course = await Course.findById(courseId);
+      if (!course) {
+        throw new NotFoundError('Course not found');
+      }
+      
+      const existingEnrollment = await Enrollment.findOne({ userId, courseId });
+      if (existingEnrollment) {
+        throw new AppError('Already enrolled in this course', 409);
+      }
+      
+      const enrollment = await Enrollment.create({
+        userId,
+        courseId
+      });
+      
+      course.enrolledCount += 1;
+      await course.save();
+      
+      return enrollment;
     }
-    
-    // Check if already enrolled
-    const existingEnrollment = await Enrollment.findOne({ userId, courseId });
-    if (existingEnrollment) {
-      throw new Error('Already enrolled in this course');
-    }
-    
-    // Create enrollment
-    const enrollment = await Enrollment.create({
-      userId,
-      courseId
-    });
-    
-    // Update course enrollment count
-    course.enrolledCount += 1;
-    await course.save();
-    
-    return enrollment;
   }
 
   /**
-   * Get user enrollments with calculated progress
+   * Get user enrollments with calculated progress (Compatibility layer)
    * @param {string} userId - User ID
    * @returns {Array} User enrollments with progress
    */
   static async getMyEnrollments(userId) {
-    const enrollments = await Enrollment.find({ userId })
-      .populate('courseId')
-      .sort({ enrolledAt: -1 });
+    logger.info(`EnrollmentService.getMyEnrollments called for user ${userId} - using AccessService`);
     
-    // Calculate dynamic progress for each enrollment
-    const enrollmentsWithProgress = await Promise.all(
-      enrollments.map(async (enrollment) => {
-        const progress = await this.calculateProgress(
-          enrollment.courseId._id, 
-          enrollment.completedLectures
-        );
-        
-        // Update stored progress if it differs
-        if (enrollment.progress !== progress) {
-          enrollment.progress = progress;
-          await enrollment.save();
-        }
-        
-        return enrollment;
-      })
-    );
-    
-    return enrollmentsWithProgress;
+    try {
+      // Use new AccessService
+      const library = await AccessService.getUserLibrary(userId);
+      
+      // Transform library items to enrollment format
+      const enrollments = library.library.map(item => ({
+        _id: item._id,
+        userId: item.userId,
+        courseId: item.productId,
+        progress: item.progress,
+        completedLectures: item.progressData?.completedLectures || [],
+        enrolledAt: item.addedToLibraryAt,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        courseId_populated: item.productId // For backward compatibility
+      }));
+      
+      return enrollments;
+    } catch (error) {
+      // Fallback to legacy system
+      logger.warn(`AccessService failed, falling back to legacy Enrollment: ${error.message}`);
+      
+      const enrollments = await Enrollment.find({ userId })
+        .populate('courseId')
+        .sort({ enrolledAt: -1 });
+      
+      const enrollmentsWithProgress = await Promise.all(
+        enrollments.map(async (enrollment) => {
+          const progress = await this.calculateProgress(
+            enrollment.courseId._id, 
+            enrollment.completedLectures
+          );
+          
+          if (enrollment.progress !== progress) {
+            enrollment.progress = progress;
+            await enrollment.save();
+          }
+          
+          return enrollment;
+        })
+      );
+      
+      return enrollmentsWithProgress;
+    }
   }
 
   /**
@@ -127,32 +172,60 @@ class EnrollmentService {
   }
 
   /**
-   * Check enrollment status and progress
+   * Check enrollment status and progress (Compatibility layer)
    * @param {string} userId - User ID
    * @param {string} courseId - Course ID
    * @returns {Object} Enrollment status
    */
   static async checkEnrollment(userId, courseId) {
-    const enrollment = await Enrollment.findOne({
-      userId,
-      courseId
-    });
+    logger.info(`EnrollmentService.checkEnrollment called for user ${userId}, course ${courseId} - using AccessService`);
     
-    if (enrollment) {
-      // Calculate dynamic progress
-      const progress = await this.calculateProgress(
-        courseId, 
-        enrollment.completedLectures
-      );
+    try {
+      // Use new AccessService
+      const accessInfo = await AccessService.checkAccess(userId, courseId);
       
-      // Update stored progress if it differs
-      if (enrollment.progress !== progress) {
-        enrollment.progress = progress;
-        await enrollment.save();
+      if (accessInfo.hasAccess) {
+        // Get full access record for progress info
+        const library = await AccessService.getUserLibrary(userId);
+        const accessRecord = library.library.find(item => 
+          item.productId.toString() === courseId.toString()
+        );
+        
+        const enrollment = {
+          _id: accessRecord._id,
+          userId: accessRecord.userId,
+          courseId: accessRecord.productId,
+          progress: accessRecord.progress,
+          completedLectures: accessRecord.progressData?.completedLectures || [],
+          enrolledAt: accessRecord.addedToLibraryAt,
+          createdAt: accessRecord.createdAt,
+          updatedAt: accessRecord.updatedAt
+        };
+        
+        return { enrolled: true, enrollment };
+      } else {
+        return { enrolled: false, enrollment: null };
       }
+    } catch (error) {
+      // Fallback to legacy system
+      logger.warn(`AccessService failed, falling back to legacy Enrollment: ${error.message}`);
+      
+      const enrollment = await Enrollment.findOne({ userId, courseId });
+      
+      if (enrollment) {
+        const progress = await this.calculateProgress(
+          courseId, 
+          enrollment.completedLectures
+        );
+        
+        if (enrollment.progress !== progress) {
+          enrollment.progress = progress;
+          await enrollment.save();
+        }
+      }
+      
+      return { enrolled: !!enrollment, enrollment };
     }
-    
-    return { enrolled: !!enrollment, enrollment };
   }
 
   /**
@@ -188,42 +261,68 @@ class EnrollmentService {
   }
 
   /**
-   * Check if user owns enrollment
+   * Check if user owns enrollment (Compatibility layer)
    * @param {string} enrollmentId - Enrollment ID
    * @param {string} userId - User ID
    * @returns {boolean} Ownership status
    */
   static async checkEnrollmentOwnership(enrollmentId, userId) {
-    const enrollment = await Enrollment.findById(enrollmentId);
-    if (!enrollment) {
-      return false;
-    }
+    logger.info(`EnrollmentService.checkEnrollmentOwnership called - using AccessService`);
     
-    return enrollment.userId.toString() === userId.toString();
+    try {
+      // Try new system first
+      return await AccessService.checkOwnership(userId, enrollmentId);
+    } catch (error) {
+      // Fallback to legacy system
+      logger.warn(`AccessService failed, falling back to legacy Enrollment: ${error.message}`);
+      
+      const enrollment = await Enrollment.findById(enrollmentId);
+      if (!enrollment) {
+        return false;
+      }
+      
+      return enrollment.userId.toString() === userId.toString();
+    }
   }
 
   /**
-   * Get enrollment statistics for a course
+   * Get enrollment statistics for a course (Compatibility layer)
    * @param {string} courseId - Course ID
    * @returns {Object} Enrollment statistics
    */
   static async getEnrollmentStats(courseId) {
-    const totalEnrollments = await Enrollment.countDocuments({ courseId });
-    const enrollments = await Enrollment.find({ courseId });
+    logger.info(`EnrollmentService.getEnrollmentStats called for course ${courseId} - using AccessService`);
     
-    // Calculate average progress
-    const totalProgress = enrollments.reduce((sum, enrollment) => sum + enrollment.progress, 0);
-    const averageProgress = totalEnrollments > 0 ? Math.round(totalProgress / totalEnrollments) : 0;
-    
-    // Count completed enrollments (100% progress)
-    const completedEnrollments = enrollments.filter(enrollment => enrollment.progress === 100).length;
-    
-    return {
-      totalEnrollments,
-      averageProgress,
-      completedEnrollments,
-      completionRate: totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0
-    };
+    try {
+      // Use new AccessService
+      const stats = await AccessService.getAccessStats(courseId);
+      
+      // Transform to enrollment format
+      return {
+        totalEnrollments: stats.totalAccess,
+        averageProgress: Math.round(stats.averageProgress),
+        completedEnrollments: stats.completedAccess,
+        completionRate: stats.completionRate
+      };
+    } catch (error) {
+      // Fallback to legacy system
+      logger.warn(`AccessService failed, falling back to legacy Enrollment: ${error.message}`);
+      
+      const totalEnrollments = await Enrollment.countDocuments({ courseId });
+      const enrollments = await Enrollment.find({ courseId });
+      
+      const totalProgress = enrollments.reduce((sum, enrollment) => sum + enrollment.progress, 0);
+      const averageProgress = totalEnrollments > 0 ? Math.round(totalProgress / totalEnrollments) : 0;
+      
+      const completedEnrollments = enrollments.filter(enrollment => enrollment.progress === 100).length;
+      
+      return {
+        totalEnrollments,
+        averageProgress,
+        completedEnrollments,
+        completionRate: totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0
+      };
+    }
   }
 }
 
