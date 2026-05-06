@@ -1,0 +1,497 @@
+import mongoose from 'mongoose';
+import logger from './logger.js';
+
+/**
+ * Database Index Configuration
+ * Optimizes query performance with strategic indexes
+ */
+
+/**
+ * Create all necessary database indexes
+ */
+export const createIndexes = async () => {
+  try {
+    logger.info('Starting database index creation');
+    
+    const db = mongoose.connection.db;
+    const collections = await db.listCollections().toArray();
+    
+    // User collection indexes
+    await createUserIndexes(db);
+    
+    // Course collection indexes
+    await createCourseIndexes(db);
+    
+    // Enrollment collection indexes
+    await createEnrollmentIndexes(db);
+    
+    // Rating collection indexes
+    await createRatingIndexes(db);
+    
+    // PendingRegistration collection indexes
+    await createPendingRegistrationIndexes(db);
+    
+    // PasswordReset collection indexes
+    await createPasswordResetIndexes(db);
+    
+    // Contact collection indexes
+    await createContactIndexes(db);
+    
+    logger.info('All database indexes created successfully');
+    
+    // Log index statistics
+    await logIndexStatistics(db);
+    
+  } catch (error) {
+    logger.error('Failed to create database indexes', error);
+    throw error;
+  }
+};
+
+/**
+ * Create User collection indexes
+ */
+const createUserIndexes = async (db) => {
+  const userCollection = db.collection('users');
+  
+  const indexes = [
+    // Email index for authentication and lookups
+    { key: { email: 1 }, name: 'email_index', unique: true },
+    
+    // Admin status index for admin queries
+    { key: { isAdmin: 1 }, name: 'admin_index' },
+    
+    // Email verification status index
+    { key: { emailVerified: 1 }, name: 'email_verified_index' },
+    
+    // Account status index
+    { key: { status: 1 }, name: 'status_index' },
+    
+    // Created at index for user analytics
+    { key: { createdAt: -1 }, name: 'created_at_index' },
+    
+    // Compound index for admin user queries
+    { 
+      key: { isAdmin: 1, emailVerified: 1, status: 1 }, 
+      name: 'admin_user_query_index' 
+    },
+    
+    // Text index for user search (name, email)
+    { 
+      key: { 
+        name: 'text', 
+        email: 'text' 
+      }, 
+      name: 'user_search_index',
+      default_language: 'none'
+    }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await userCollection.createIndex(index.key, { 
+        name: index.name, 
+        unique: index.unique || false,
+        background: true 
+      });
+      logger.debug(`Created user index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create user index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create Course collection indexes
+ */
+const createCourseIndexes = async (db) => {
+  const courseCollection = db.collection('courses');
+  
+  const indexes = [
+    // Title text index for search functionality
+    { 
+      key: { 
+        title: 'text', 
+        description: 'text', 
+        instructor: 'text' 
+      }, 
+      name: 'course_search_index',
+      default_language: 'none'
+    },
+    
+    // Category index for filtering
+    { key: { category: 1 }, name: 'category_index' },
+    
+    // Level index for filtering
+    { key: { level: 1 }, name: 'level_index' },
+    
+    // Instructor index for filtering
+    { key: { instructor: 1 }, name: 'instructor_index' },
+    
+    // Published status index for public queries
+    { key: { isPublished: 1 }, name: 'published_index' },
+    
+    // Created at index for sorting
+    { key: { createdAt: -1 }, name: 'course_created_at_index' },
+    
+    // Updated at index for sorting
+    { key: { updatedAt: -1 }, name: 'course_updated_at_index' },
+    
+    // Price index for filtering and sorting
+    { key: { price: 1 }, name: 'price_index' },
+    
+    // Enrollment count index for sorting popular courses
+    { key: { enrollmentCount: -1 }, name: 'enrollment_count_index' },
+    
+    // Average rating index for sorting top-rated courses
+    { key: { averageRating: -1 }, name: 'average_rating_index' },
+    
+    // Compound index for published course queries
+    { 
+      key: { isPublished: 1, category: 1, level: 1 }, 
+      name: 'published_course_filter_index' 
+    },
+    
+    // Compound index for course listing with sorting
+    { 
+      key: { isPublished: 1, createdAt: -1 }, 
+      name: 'published_course_sort_index' 
+    },
+    
+    // Compound index for instructor courses
+    { 
+      key: { instructor: 1, isPublished: 1, createdAt: -1 }, 
+      name: 'instructor_course_index' 
+    },
+    
+    // Created by index for ownership queries
+    { key: { createdBy: 1 }, name: 'created_by_index' }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await courseCollection.createIndex(index.key, { 
+        name: index.name, 
+        unique: index.unique || false,
+        background: true 
+      });
+      logger.debug(`Created course index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create course index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create Enrollment collection indexes
+ */
+const createEnrollmentIndexes = async (db) => {
+  const enrollmentCollection = db.collection('enrollments');
+  
+  const indexes = [
+    // Compound index for user enrollment lookups (most critical)
+    { 
+      key: { userId: 1, courseId: 1 }, 
+      name: 'user_course_enrollment_index',
+      unique: true 
+    },
+    
+    // User index for user enrollment lists
+    { key: { userId: 1 }, name: 'user_enrollment_index' },
+    
+    // Course index for course enrollment lists
+    { key: { courseId: 1 }, name: 'course_enrollment_index' },
+    
+    // Status index for filtering
+    { key: { status: 1 }, name: 'enrollment_status_index' },
+    
+    // Created at index for sorting
+    { key: { createdAt: -1 }, name: 'enrollment_created_at_index' },
+    
+    // Updated at index for progress tracking
+    { key: { updatedAt: -1 }, name: 'enrollment_updated_at_index' },
+    
+    // Progress index for completion tracking
+    { key: { progress: 1 }, name: 'progress_index' },
+    
+    // Compound index for user enrollment with status
+    { 
+      key: { userId: 1, status: 1, createdAt: -1 }, 
+      name: 'user_enrollment_status_index' 
+    },
+    
+    // Compound index for course enrollment with status
+    { 
+      key: { courseId: 1, status: 1, createdAt: -1 }, 
+      name: 'course_enrollment_status_index' 
+    },
+    
+    // Compound index for completion tracking
+    { 
+      key: { userId: 1, status: 1, progress: 1 }, 
+      name: 'user_completion_index' 
+    },
+    
+    // Completed at index for completed courses
+    { key: { completedAt: -1 }, name: 'completed_at_index' }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await enrollmentCollection.createIndex(index.key, { 
+        name: index.name, 
+        unique: index.unique || false,
+        background: true 
+      });
+      logger.debug(`Created enrollment index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create enrollment index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create Rating collection indexes
+ */
+const createRatingIndexes = async (db) => {
+  const ratingCollection = db.collection('ratings');
+  
+  const indexes = [
+    // Course ID index for course rating lookups
+    { key: { courseId: 1 }, name: 'course_rating_index' },
+    
+    // User ID index for user rating lookups
+    { key: { userId: 1 }, name: 'user_rating_index' },
+    
+    // Compound index for user course rating (unique constraint)
+    { 
+      key: { userId: 1, courseId: 1 }, 
+      name: 'user_course_rating_index',
+      unique: true 
+    },
+    
+    // Rating value index for statistics
+    { key: { rating: 1 }, name: 'rating_value_index' },
+    
+    // Created at index for sorting
+    { key: { createdAt: -1 }, name: 'rating_created_at_index' },
+    
+    // Updated at index for recent updates
+    { key: { updatedAt: -1 }, name: 'rating_updated_at_index' },
+    
+    // Compound index for course rating statistics
+    { 
+      key: { courseId: 1, rating: 1, createdAt: -1 }, 
+      name: 'course_rating_stats_index' 
+    }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await ratingCollection.createIndex(index.key, { 
+        name: index.name, 
+        unique: index.unique || false,
+        background: true 
+      });
+      logger.debug(`Created rating index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create rating index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create PendingRegistration collection indexes
+ */
+const createPendingRegistrationIndexes = async (db) => {
+  const pendingCollection = db.collection('pendingregistrations');
+  
+  const indexes = [
+    // Email index for lookup
+    { key: { email: 1 }, name: 'pending_email_index' },
+    
+    // OTP index for verification
+    { key: { otp: 1 }, name: 'pending_otp_index' },
+    
+    // OTP expiry index for cleanup
+    { key: { otpExpiry: 1 }, name: 'pending_otp_expiry_index' },
+    
+    // Created at index for cleanup
+    { key: { createdAt: -1 }, name: 'pending_created_at_index' }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await pendingCollection.createIndex(index.key, { 
+        name: index.name, 
+        background: true 
+      });
+      logger.debug(`Created pending registration index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create pending registration index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create PasswordReset collection indexes
+ */
+const createPasswordResetIndexes = async (db) => {
+  const passwordResetCollection = db.collection('passwordresets');
+  
+  const indexes = [
+    // User ID index for lookup
+    { key: { userId: 1 }, name: 'password_reset_user_index' },
+    
+    // Reset token index for verification
+    { key: { resetToken: 1 }, name: 'password_reset_token_index' },
+    
+    // Token expiry index for cleanup
+    { key: { resetTokenExpiry: 1 }, name: 'password_reset_expiry_index' },
+    
+    // Created at index for cleanup
+    { key: { createdAt: -1 }, name: 'password_reset_created_at_index' }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await passwordResetCollection.createIndex(index.key, { 
+        name: index.name, 
+        background: true 
+      });
+      logger.debug(`Created password reset index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create password reset index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create Contact collection indexes
+ */
+const createContactIndexes = async (db) => {
+  const contactCollection = db.collection('contacts');
+  
+  const indexes = [
+    // Email index for lookup
+    { key: { email: 1 }, name: 'contact_email_index' },
+    
+    // Status index for filtering
+    { key: { status: 1 }, name: 'contact_status_index' },
+    
+    // Created at index for sorting
+    { key: { createdAt: -1 }, name: 'contact_created_at_index' },
+    
+    // Text index for search
+    { 
+      key: { 
+        name: 'text', 
+        email: 'text', 
+        message: 'text' 
+      }, 
+      name: 'contact_search_index',
+      default_language: 'none'
+    }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await contactCollection.createIndex(index.key, { 
+        name: index.name, 
+        background: true 
+      });
+      logger.debug(`Created contact index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create contact index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Log index statistics for monitoring
+ */
+const logIndexStatistics = async (db) => {
+  try {
+    const collections = ['users', 'courses', 'enrollments', 'ratings', 'pendingregistrations', 'passwordresets', 'contacts'];
+    
+    for (const collectionName of collections) {
+      try {
+        const collection = db.collection(collectionName);
+        const indexes = await collection.indexInformation();
+        
+        logger.info(`Index statistics for ${collectionName}`, {
+          collection: collectionName,
+          indexCount: Object.keys(indexes).length,
+          indexes: Object.keys(indexes)
+        });
+      } catch (error) {
+        logger.warn(`Failed to get index statistics for ${collectionName}:`, error.message);
+      }
+    }
+  } catch (error) {
+    logger.error('Failed to log index statistics:', error);
+  }
+};
+
+/**
+ * Drop all indexes (for testing/reset)
+ */
+export const dropAllIndexes = async () => {
+  try {
+    logger.warn('Dropping all database indexes');
+    
+    const db = mongoose.connection.db;
+    const collections = await db.listCollections().toArray();
+    
+    for (const collection of collections) {
+      try {
+        await db.collection(collection.name).dropIndexes();
+        logger.debug(`Dropped indexes for collection: ${collection.name}`);
+      } catch (error) {
+        logger.warn(`Failed to drop indexes for ${collection.name}:`, error.message);
+      }
+    }
+    
+    logger.info('All database indexes dropped successfully');
+  } catch (error) {
+    logger.error('Failed to drop database indexes:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get index usage statistics
+ */
+export const getIndexUsageStats = async () => {
+  try {
+    const db = mongoose.connection.db;
+    const collections = ['users', 'courses', 'enrollments', 'ratings'];
+    const stats = {};
+    
+    for (const collectionName of collections) {
+      try {
+        const collection = db.collection(collectionName);
+        const indexes = await collection.indexInformation();
+        
+        stats[collectionName] = {
+          indexCount: Object.keys(indexes).length,
+          indexes: Object.keys(indexes)
+        };
+      } catch (error) {
+        logger.warn(`Failed to get index stats for ${collectionName}:`, error.message);
+        stats[collectionName] = { error: error.message };
+      }
+    }
+    
+    return stats;
+  } catch (error) {
+    logger.error('Failed to get index usage statistics:', error);
+    return {};
+  }
+};
+
+export default {
+  createIndexes,
+  dropAllIndexes,
+  getIndexUsageStats
+};
