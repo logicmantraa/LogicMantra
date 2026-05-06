@@ -1,5 +1,5 @@
 import Resource from '../models/Resource.js';
-import Course from '../models/Course.js';
+import Product from '../models/Product.js';
 import Lecture from '../models/Lecture.js';
 
 // @desc    Get resources with optional filtering
@@ -7,15 +7,15 @@ import Lecture from '../models/Lecture.js';
 // @access  Private/Admin
 export const getResources = async (req, res) => {
   try {
-    const { courseId, lectureId } = req.query;
+    const { productId, lectureId } = req.query;
 
     const query = {};
-    if (courseId) query.courseId = courseId;
+    if (productId) query.productId = productId;
     if (lectureId) query.lectureId = lectureId;
 
     const resources = await Resource.find(query)
       .populate('lectureId', 'title')
-      .populate('courseId', 'title');
+      .populate('productId', 'title');
 
     res.json(resources);
   } catch (error) {
@@ -23,14 +23,14 @@ export const getResources = async (req, res) => {
   }
 };
 
-// @desc    Get resources by course
-// @route   GET /api/resources/course/:courseId
+// @desc    Get resources by product
+// @route   GET /api/resources/product/:productId
 // @access  Public
-export const getResourcesByCourse = async (req, res) => {
+export const getResourcesByProduct = async (req, res) => {
   try {
-    const resources = await Resource.find({ courseId: req.params.courseId })
+    const resources = await Resource.find({ productId: req.params.productId })
       .populate('lectureId', 'title')
-      .populate('courseId', 'title');
+      .populate('productId', 'title');
     res.json(resources);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -55,7 +55,7 @@ export const getResourcesByLecture = async (req, res) => {
 export const getResourceById = async (req, res) => {
   try {
     const resource = await Resource.findById(req.params.id)
-      .populate('courseId')
+      .populate('productId')
       .populate('lectureId');
     
     if (!resource) {
@@ -75,11 +75,11 @@ export const getResourceById = async (req, res) => {
 // @access  Private/Admin
 export const createResource = async (req, res) => {
   try {
-    const course = await Course.findById(req.body.courseId);
+    const product = await Product.findById(req.body.productId);
     
-    if (!course) {
+    if (!product) {
       res.status(404);
-      throw new Error('Course not found');
+      throw new Error('Product not found');
     }
     
     if (req.body.lectureId) {

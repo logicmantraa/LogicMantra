@@ -6,12 +6,11 @@ import mongoose from 'mongoose';
 // Import routes
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
-import courseRoutes from './routes/course.js';
 import lectureRoutes from './routes/lecture.js';
 import resourceRoutes from './routes/resource.js';
-import enrollmentRoutes from './routes/enrollment.js';
 import ratingRoutes from './routes/rating.js';
 import storeRoutes from './routes/store.js';
+import libraryRoutes from './routes/libraryRoutes.js';
 import adminRoutes from './routes/admin.js';
 import contactRoutes from './routes/contact.js';
 
@@ -56,12 +55,11 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes);
 app.use('/api/lectures', lectureRoutes);
 app.use('/api/resources', resourceRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/store', storeRoutes);
+app.use('/api/library', libraryRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 

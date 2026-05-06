@@ -19,12 +19,6 @@ export const createIndexes = async () => {
     // User collection indexes
     await createUserIndexes(db);
     
-    // Course collection indexes
-    await createCourseIndexes(db);
-    
-    // Enrollment collection indexes
-    await createEnrollmentIndexes(db);
-    
     // Rating collection indexes
     await createRatingIndexes(db);
     
@@ -107,154 +101,6 @@ const createUserIndexes = async (db) => {
   }
 };
 
-/**
- * Create Course collection indexes
- */
-const createCourseIndexes = async (db) => {
-  const courseCollection = db.collection('courses');
-  
-  const indexes = [
-    // Title text index for search functionality
-    { 
-      key: { 
-        title: 'text', 
-        description: 'text', 
-        instructor: 'text' 
-      }, 
-      name: 'course_search_index',
-      default_language: 'none'
-    },
-    
-    // Category index for filtering
-    { key: { category: 1 }, name: 'category_index' },
-    
-    // Level index for filtering
-    { key: { level: 1 }, name: 'level_index' },
-    
-    // Instructor index for filtering
-    { key: { instructor: 1 }, name: 'instructor_index' },
-    
-    // Published status index for public queries
-    { key: { isPublished: 1 }, name: 'published_index' },
-    
-    // Created at index for sorting
-    { key: { createdAt: -1 }, name: 'course_created_at_index' },
-    
-    // Updated at index for sorting
-    { key: { updatedAt: -1 }, name: 'course_updated_at_index' },
-    
-    // Price index for filtering and sorting
-    { key: { price: 1 }, name: 'price_index' },
-    
-    // Enrollment count index for sorting popular courses
-    { key: { enrollmentCount: -1 }, name: 'enrollment_count_index' },
-    
-    // Average rating index for sorting top-rated courses
-    { key: { averageRating: -1 }, name: 'average_rating_index' },
-    
-    // Compound index for published course queries
-    { 
-      key: { isPublished: 1, category: 1, level: 1 }, 
-      name: 'published_course_filter_index' 
-    },
-    
-    // Compound index for course listing with sorting
-    { 
-      key: { isPublished: 1, createdAt: -1 }, 
-      name: 'published_course_sort_index' 
-    },
-    
-    // Compound index for instructor courses
-    { 
-      key: { instructor: 1, isPublished: 1, createdAt: -1 }, 
-      name: 'instructor_course_index' 
-    },
-    
-    // Created by index for ownership queries
-    { key: { createdBy: 1 }, name: 'created_by_index' }
-  ];
-  
-  for (const index of indexes) {
-    try {
-      await courseCollection.createIndex(index.key, { 
-        name: index.name, 
-        unique: index.unique || false,
-        background: true 
-      });
-      logger.debug(`Created course index: ${index.name}`);
-    } catch (error) {
-      logger.warn(`Failed to create course index ${index.name}:`, error.message);
-    }
-  }
-};
-
-/**
- * Create Enrollment collection indexes
- */
-const createEnrollmentIndexes = async (db) => {
-  const enrollmentCollection = db.collection('enrollments');
-  
-  const indexes = [
-    // Compound index for user enrollment lookups (most critical)
-    { 
-      key: { userId: 1, courseId: 1 }, 
-      name: 'user_course_enrollment_index',
-      unique: true 
-    },
-    
-    // User index for user enrollment lists
-    { key: { userId: 1 }, name: 'user_enrollment_index' },
-    
-    // Course index for course enrollment lists
-    { key: { courseId: 1 }, name: 'course_enrollment_index' },
-    
-    // Status index for filtering
-    { key: { status: 1 }, name: 'enrollment_status_index' },
-    
-    // Created at index for sorting
-    { key: { createdAt: -1 }, name: 'enrollment_created_at_index' },
-    
-    // Updated at index for progress tracking
-    { key: { updatedAt: -1 }, name: 'enrollment_updated_at_index' },
-    
-    // Progress index for completion tracking
-    { key: { progress: 1 }, name: 'progress_index' },
-    
-    // Compound index for user enrollment with status
-    { 
-      key: { userId: 1, status: 1, createdAt: -1 }, 
-      name: 'user_enrollment_status_index' 
-    },
-    
-    // Compound index for course enrollment with status
-    { 
-      key: { courseId: 1, status: 1, createdAt: -1 }, 
-      name: 'course_enrollment_status_index' 
-    },
-    
-    // Compound index for completion tracking
-    { 
-      key: { userId: 1, status: 1, progress: 1 }, 
-      name: 'user_completion_index' 
-    },
-    
-    // Completed at index for completed courses
-    { key: { completedAt: -1 }, name: 'completed_at_index' }
-  ];
-  
-  for (const index of indexes) {
-    try {
-      await enrollmentCollection.createIndex(index.key, { 
-        name: index.name, 
-        unique: index.unique || false,
-        background: true 
-      });
-      logger.debug(`Created enrollment index: ${index.name}`);
-    } catch (error) {
-      logger.warn(`Failed to create enrollment index ${index.name}:`, error.message);
-    }
-  }
-};
 
 /**
  * Create Rating collection indexes
@@ -263,16 +109,16 @@ const createRatingIndexes = async (db) => {
   const ratingCollection = db.collection('ratings');
   
   const indexes = [
-    // Course ID index for course rating lookups
-    { key: { courseId: 1 }, name: 'course_rating_index' },
+    // Product ID index for product rating lookups
+    { key: { productId: 1 }, name: 'product_rating_index' },
     
     // User ID index for user rating lookups
     { key: { userId: 1 }, name: 'user_rating_index' },
     
-    // Compound index for user course rating (unique constraint)
+    // Compound index for user product rating (unique constraint)
     { 
-      key: { userId: 1, courseId: 1 }, 
-      name: 'user_course_rating_index',
+      key: { userId: 1, productId: 1 }, 
+      name: 'user_product_rating_index',
       unique: true 
     },
     
@@ -559,7 +405,7 @@ export const dropAllIndexes = async () => {
 export const getIndexUsageStats = async () => {
   try {
     const db = mongoose.connection.db;
-    const collections = ['users', 'courses', 'enrollments', 'ratings'];
+    const collections = ['users', 'products', 'userproductaccesses', 'ratings'];
     const stats = {};
     
     for (const collectionName of collections) {

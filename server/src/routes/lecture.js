@@ -1,6 +1,6 @@
 import express from 'express';
 import {
-  getLecturesByCourse,
+  getLecturesByProduct,
   getLectureById,
   createLecture,
   updateLecture,
@@ -10,7 +10,7 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/course/:courseId', getLecturesByCourse);
+router.get('/product/:productId', getLecturesByProduct);
 
 router.route('/')
   .post(protect, admin, createLecture);

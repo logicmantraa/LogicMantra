@@ -1,12 +1,12 @@
 import Lecture from '../models/Lecture.js';
-import Course from '../models/Course.js';
+import Product from '../models/Product.js';
 
-// @desc    Get all lectures for a course
-// @route   GET /api/lectures/course/:courseId
+// @desc    Get all lectures for a product
+// @route   GET /api/lectures/product/:productId
 // @access  Public
-export const getLecturesByCourse = async (req, res) => {
+export const getLecturesByProduct = async (req, res) => {
   try {
-    const lectures = await Lecture.find({ courseId: req.params.courseId })
+    const lectures = await Lecture.find({ productId: req.params.productId })
       .sort({ order: 1 });
     
     res.json(lectures);
@@ -20,7 +20,7 @@ export const getLecturesByCourse = async (req, res) => {
 // @access  Public
 export const getLectureById = async (req, res) => {
   try {
-    const lecture = await Lecture.findById(req.params.id).populate('courseId');
+    const lecture = await Lecture.findById(req.params.id).populate('productId');
     
     if (!lecture) {
       res.status(404);
@@ -39,11 +39,11 @@ export const getLectureById = async (req, res) => {
 // @access  Private/Admin
 export const createLecture = async (req, res) => {
   try {
-    const course = await Course.findById(req.body.courseId);
+    const product = await Product.findById(req.body.productId);
     
-    if (!course) {
+    if (!product) {
       res.status(404);
-      throw new Error('Course not found');
+      throw new Error('Product not found');
     }
     
     const lecture = await Lecture.create(req.body);

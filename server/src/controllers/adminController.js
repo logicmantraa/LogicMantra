@@ -1,6 +1,6 @@
 import User from '../models/User.js';
-import Course from '../models/Course.js';
-import Enrollment from '../models/Enrollment.js';
+import Product from '../models/Product.js';
+import UserProductAccess from '../models/UserProductAccess.js';
 import Rating from '../models/Rating.js';
 
 // @desc    Get dashboard analytics
@@ -11,11 +11,11 @@ export const getDashboardStats = async (req, res) => {
     // Total users
     const totalUsers = await User.countDocuments();
     
-    // Total courses
-    const totalCourses = await Course.countDocuments();
+    // Total products
+    const totalProducts = await Product.countDocuments();
     
-    // Total enrollments
-    const totalEnrollments = await Enrollment.countDocuments();
+    // Total access
+    const totalAccess = await UserProductAccess.countDocuments();
     
     // User growth (last 30 days)
     const thirtyDaysAgo = new Date();
@@ -24,23 +24,23 @@ export const getDashboardStats = async (req, res) => {
       createdAt: { $gte: thirtyDaysAgo }
     });
     
-    // Course popularity (top 5 by enrollments)
-    const popularCourses = await Course.find()
-      .sort({ enrolledCount: -1 })
+    // Product popularity (top 5 by access)
+    const popularProducts = await Product.find()
+      .sort({ accessCount: -1 })
       .limit(5)
-      .select('title enrolledCount rating');
+      .select('title accessCount rating');
     
-    // Top rated courses
-    const topRatedCourses = await Course.find()
+    // Top rated products
+    const topRatedProducts = await Product.find()
       .sort({ rating: -1 })
       .limit(5)
       .select('title rating totalRatings');
     
-    // Recent enrollments (last 7 days)
+    // Recent access (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentEnrollments = await Enrollment.countDocuments({
-      enrolledAt: { $gte: sevenDaysAgo }
+    const recentAccess = await UserProductAccess.countDocuments({
+      addedToLibraryAt: { $gte: sevenDaysAgo }
     });
     
     // Total revenue (for future - currently 0)
@@ -48,13 +48,13 @@ export const getDashboardStats = async (req, res) => {
     
     res.json({
       totalUsers,
-      totalCourses,
-      totalEnrollments,
+      totalProducts,
+      totalAccess,
       newUsers,
-      recentEnrollments,
+      recentAccess,
       totalRevenue,
-      popularCourses,
-      topRatedCourses
+      popularProducts,
+      topRatedProducts
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

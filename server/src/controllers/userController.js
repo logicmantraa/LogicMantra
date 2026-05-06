@@ -1,6 +1,6 @@
 import User from '../models/User.js';
-import Enrollment from '../models/Enrollment.js';
-import Course from '../models/Course.js';
+import UserProductAccess from '../models/UserProductAccess.js';
+import Product from '../models/Product.js';
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -33,27 +33,25 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// @desc    Check if user is subscribed (has paid course enrollments or active subscription)
+// @desc    Check if user is subscribed (has paid product access or active subscription)
 // @route   GET /api/users/check-subscription
 // @access  Private
 export const checkSubscription = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user.id;
     
-    // Check if user has active subscription
-    const user = await User.findById(userId);
-    if (user.hasSubscription && user.subscriptionExpiresAt && new Date() < user.subscriptionExpiresAt) {
-      return res.json({ isSubscribed: true, reason: 'active_subscription' });
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
     }
     
-    // Check if user has enrolled in any paid courses
-    const enrollments = await Enrollment.find({ userId }).populate('courseId');
-    const hasPaidEnrollment = enrollments.some(
-      enrollment => enrollment.courseId && !enrollment.courseId.isFree && enrollment.courseId.price > 0
+    // Check if user has purchased any paid products
+    const accesses = await UserProductAccess.find({ userId }).populate('productId');
+    const hasPaidAccess = accesses.some(
+      access => access.productId && !access.productId.isFree && access.productId.price > 0
     );
     
-    if (hasPaidEnrollment) {
-      return res.json({ isSubscribed: true, reason: 'paid_course_enrollment' });
+    if (hasPaidAccess) {
+      return res.json({ isSubscribed: true, reason: 'paid_product_access' });
     }
     
     res.json({ isSubscribed: false, reason: 'no_paid_content' });

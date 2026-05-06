@@ -1,7 +1,7 @@
 import UserProductAccess from '../models/UserProductAccess.js';
 import Product from '../models/Product.js';
 import { AppError, NotFoundError, ValidationError, ConflictError } from '../errors/customErrors.js';
-import logger from '../utils/logger.js';
+import logger from '../config/logger.js';
 
 /**
  * AccessService - Manages user access to products

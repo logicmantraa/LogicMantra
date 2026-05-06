@@ -1,23 +1,23 @@
 import Rating from '../models/Rating.js';
-import Course from '../models/Course.js';
+import Product from '../models/Product.js';
 
 // @desc    Submit rating/feedback
 // @route   POST /api/ratings
 // @access  Private
 export const submitRating = async (req, res) => {
   try {
-    const { courseId, rating, feedback } = req.body;
+    const { productId, rating, feedback } = req.body;
     const userId = req.user._id;
     
-    const course = await Course.findById(courseId);
+    const product = await Product.findById(productId);
     
-    if (!course) {
+    if (!product) {
       res.status(404);
-      throw new Error('Course not found');
+      throw new Error('Product not found');
     }
     
     // Check if rating already exists
-    let existingRating = await Rating.findOne({ userId, courseId });
+    let existingRating = await Rating.findOne({ userId, productId });
     
     if (existingRating) {
       // Update existing rating
@@ -28,19 +28,19 @@ export const submitRating = async (req, res) => {
       // Create new rating
       existingRating = await Rating.create({
         userId,
-        courseId,
+        productId,
         rating,
         feedback: feedback || ''
       });
     }
     
-    // Update course average rating
-    const ratings = await Rating.find({ courseId });
+    // Update product average rating
+    const ratings = await Rating.find({ productId });
     const avgRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
     
-    course.rating = avgRating;
-    course.totalRatings = ratings.length;
-    await course.save();
+    product.rating = avgRating;
+    product.totalRatings = ratings.length;
+    await product.save();
     
     res.status(201).json(existingRating);
   } catch (error) {
@@ -49,12 +49,12 @@ export const submitRating = async (req, res) => {
   }
 };
 
-// @desc    Get ratings for a course
-// @route   GET /api/ratings/course/:courseId
+// @desc    Get ratings for a product
+// @route   GET /api/ratings/product/:productId
 // @access  Public
-export const getCourseRatings = async (req, res) => {
+export const getProductRatings = async (req, res) => {
   try {
-    const ratings = await Rating.find({ courseId: req.params.courseId })
+    const ratings = await Rating.find({ productId: req.params.productId })
       .populate('userId', 'name email')
       .sort({ createdAt: -1 });
     
@@ -64,14 +64,14 @@ export const getCourseRatings = async (req, res) => {
   }
 };
 
-// @desc    Get user's rating for a course
-// @route   GET /api/ratings/course/:courseId/my-rating
+// @desc    Get user's rating for a product
+// @route   GET /api/ratings/product/:productId/my-rating
 // @access  Private
 export const getMyRating = async (req, res) => {
   try {
     const rating = await Rating.findOne({
       userId: req.user._id,
-      courseId: req.params.courseId
+      productId: req.params.productId
     });
     
     res.json(rating || null);
@@ -103,13 +103,13 @@ export const updateRating = async (req, res) => {
     
     await rating.save();
     
-    // Update course average rating
-    const ratings = await Rating.find({ courseId: rating.courseId });
+    // Update product average rating
+    const ratings = await Rating.find({ productId: rating.productId });
     const avgRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
     
-    const course = await Course.findById(rating.courseId);
-    course.rating = avgRating;
-    await course.save();
+    const product = await Product.findById(rating.productId);
+    product.rating = avgRating;
+    await product.save();
     
     res.json(rating);
   } catch (error) {
@@ -136,19 +136,19 @@ export const deleteRating = async (req, res) => {
       throw new Error('Not authorized');
     }
     
-    const courseId = rating.courseId;
+    const productId = rating.productId;
     await rating.deleteOne();
     
-    // Update course average rating
-    const ratings = await Rating.find({ courseId });
+    // Update product average rating
+    const ratings = await Rating.find({ productId });
     const avgRating = ratings.length > 0 
       ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
       : 0;
     
-    const course = await Course.findById(courseId);
-    course.rating = avgRating;
-    course.totalRatings = ratings.length;
-    await course.save();
+    const product = await Product.findById(productId);
+    product.rating = avgRating;
+    product.totalRatings = ratings.length;
+    await product.save();
     
     res.json({ message: 'Rating removed' });
   } catch (error) {

@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   getResources,
-  getResourcesByCourse,
+  getResourcesByProduct,
   getResourcesByLecture,
   getResourceById,
   createResource,
@@ -13,7 +13,7 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.get('/', protect, admin, getResources);
-router.get('/course/:courseId', getResourcesByCourse);
+router.get('/product/:productId', getResourcesByProduct);
 router.get('/lecture/:lectureId', getResourcesByLecture);
 
 router.route('/')

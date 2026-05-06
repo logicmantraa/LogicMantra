@@ -1,6 +1,6 @@
 import User from '../models/User.js';
-import Course from '../models/Course.js';
-import Enrollment from '../models/Enrollment.js';
+import Product from '../models/Product.js';
+import UserProductAccess from '../models/UserProductAccess.js';
 import Rating from '../models/Rating.js';
 
 /**
@@ -16,8 +16,8 @@ class AdminService {
   static async getDashboardStats() {
     // Total counts
     const totalUsers = await User.countDocuments();
-    const totalCourses = await Course.countDocuments();
-    const totalEnrollments = await Enrollment.countDocuments();
+    const totalProducts = await Product.countDocuments();
+    const totalAccess = await UserProductAccess.countDocuments();
     
     // User growth (last 30 days)
     const thirtyDaysAgo = new Date();
@@ -26,11 +26,11 @@ class AdminService {
       createdAt: { $gte: thirtyDaysAgo }
     });
     
-    // Recent enrollments (last 7 days)
+    // Recent access (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentEnrollments = await Enrollment.countDocuments({
-      enrolledAt: { $gte: sevenDaysAgo }
+    const recentAccess = await UserProductAccess.countDocuments({
+      addedToLibraryAt: { $gte: sevenDaysAgo }
     });
     
     // Course analytics
@@ -45,10 +45,10 @@ class AdminService {
     
     return {
       totalUsers,
-      totalCourses,
-      totalEnrollments,
+      totalProducts,
+      totalAccess,
       newUsers,
-      recentEnrollments,
+      recentAccess,
       totalRevenue,
       popularCourses,
       topRatedCourses,
@@ -101,17 +101,15 @@ class AdminService {
   }
 
   /**
-   * Get popular courses by enrollment count
-   * @param {number} limit - Number of courses to return
-   * @returns {Array} List of popular courses
+   * Get popular products by access count
+   * @param {number} limit - Number of products to return
+   * @returns {Array} List of popular products
    */
   static async getPopularCourses(limit = 5) {
-    const courses = await Course.find()
-      .sort({ enrolledCount: -1 })
+    return await Product.find({ status: 'published' })
+      .sort({ accessCount: -1 })
       .limit(limit)
-      .select('title enrolledCount rating thumbnail');
-    
-    return courses;
+      .select('title thumbnail accessCount rating category');
   }
 
   /**
@@ -120,64 +118,99 @@ class AdminService {
    * @returns {Array} List of top rated courses
    */
   static async getTopRatedCourses(limit = 5) {
-    const courses = await Course.find()
+    const products = await Product.find({ status: 'published' })
       .sort({ rating: -1 })
       .limit(limit)
-      .select('title rating totalRatings thumbnail');
+      .select('title thumbnail rating category totalRatings');
     
-    return courses;
+    return products;
   }
 
   /**
-   * Get enrollment statistics
-   * @returns {Object} Enrollment analytics
+   * Get access statistics
+   * @returns {Object} Access analytics
    */
-  static async getEnrollmentStats() {
-    const totalEnrollments = await Enrollment.countDocuments();
+  static async getAccessStats() {
+    const totalAccess = await UserProductAccess.countDocuments();
     
-    // Enrollment growth (last 30 days)
+    // Access growth (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentEnrollments = await Enrollment.countDocuments({
-      enrolledAt: { $gte: thirtyDaysAgo }
+    const recentAccess = await UserProductAccess.countDocuments({
+      addedToLibraryAt: { $gte: thirtyDaysAgo }
     });
     
-    // This month enrollments
+    // This month access
     const now = new Date();
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const thisMonthEnrollments = await Enrollment.countDocuments({
-      enrolledAt: { $gte: thisMonthStart }
+    const thisMonthAccess = await UserProductAccess.countDocuments({
+      addedToLibraryAt: { $gte: thisMonthStart }
     });
     
-    // Course enrollment distribution
-    const courseEnrollments = await Enrollment.aggregate([
+    // Product access distribution
+    const productAccess = await UserProductAccess.aggregate([
       {
         $group: {
-          _id: '$courseId',
+          _id: '$productId',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    
+    return {
+      totalAccess,
+      recentAccess,
+      thisMonthAccess,
+      topProducts: productAccess
+    };
+  }
+
+
+  /**
+   * Get product statistics
+   * @returns {Object} Product analytics
+   */
+  static async getProductStats() {
+    const totalProducts = await Product.countDocuments();
+    
+    // Products by category
+    const productsByCategory = await Product.aggregate([
+      {
+        $group: {
+          _id: '$category',
           count: { $sum: 1 }
         }
       },
       {
-        $lookup: {
-          from: 'courses',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'course'
+        $sort: { count: -1 }
+      }
+    ]);
+    
+    // Products by type
+    const productsByType = await Product.aggregate([
+      {
+        $group: {
+          _id: '$productType',
+          count: { $sum: 1 }
         }
       },
       {
         $sort: { count: -1 }
-      },
-      {
-        $limit: 10
       }
     ]);
     
+    // Published vs draft products
+    const publishedProducts = await Product.countDocuments({ status: 'published' });
+    const draftProducts = await Product.countDocuments({ status: 'draft' });
+    
     return {
-      totalEnrollments,
-      recentEnrollments,
-      thisMonthEnrollments,
-      topCourses: courseEnrollments
+      totalProducts,
+      publishedProducts,
+      draftProducts,
+      productsByCategory,
+      productsByType
     };
   }
 
@@ -186,10 +219,10 @@ class AdminService {
    * @returns {Object} Course analytics
    */
   static async getCourseStats() {
-    const totalCourses = await Course.countDocuments();
+    const totalCourses = await Product.countDocuments();
     
     // Courses by category
-    const coursesByCategory = await Course.aggregate([
+    const coursesByCategory = await Product.aggregate([
       {
         $group: {
           _id: '$category',
@@ -202,7 +235,7 @@ class AdminService {
     ]);
     
     // Courses by level
-    const coursesByLevel = await Course.aggregate([
+    const coursesByLevel = await Product.aggregate([
       {
         $group: {
           _id: '$level',
@@ -212,11 +245,11 @@ class AdminService {
     ]);
     
     // Free vs paid courses
-    const freeCourses = await Course.countDocuments({ isFree: true });
+    const freeCourses = await Product.countDocuments({ isFree: true });
     const paidCourses = totalCourses - freeCourses;
     
     // Average course rating
-    const ratingStats = await Course.aggregate([
+    const ratingStats = await Product.aggregate([
       {
         $group: {
           _id: null,
@@ -253,8 +286,8 @@ class AdminService {
       createdAt: { $gte: last24Hours }
     });
     
-    const recentEnrollments = await Enrollment.countDocuments({
-      enrolledAt: { $gte: last24Hours }
+    const recentAccess = await UserProductAccess.countDocuments({
+      addedToLibraryAt: { $gte: last24Hours }
     });
     
     const recentRatings = await Rating.countDocuments({
@@ -266,7 +299,7 @@ class AdminService {
       lastChecked: now,
       recentActivity: {
         newUsers: recentUsers,
-        newEnrollments: recentEnrollments,
+        newAccess: recentAccess,
         newRatings: recentRatings
       }
     };
@@ -305,13 +338,13 @@ class AdminService {
       }
     ]);
     
-    // Enrollment analytics
-    const enrollmentAnalytics = await Enrollment.aggregate([
+    // Access analytics
+    const accessAnalytics = await UserProductAccess.aggregate([
       { $match: dateFilter },
       {
         $group: {
           _id: null,
-          totalEnrollments: { $sum: 1 }
+          totalAccess: { $sum: 1 }
         }
       }
     ]);
@@ -319,7 +352,7 @@ class AdminService {
     return {
       period: { startDate, endDate },
       userAnalytics: userAnalytics[0] || {},
-      enrollmentAnalytics: enrollmentAnalytics[0] || {}
+      accessAnalytics: accessAnalytics[0] || {}
     };
   }
 }

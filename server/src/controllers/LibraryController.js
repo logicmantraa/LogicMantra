@@ -1,7 +1,7 @@
 import AccessService from '../services/AccessService.js';
 import ProductService from '../services/ProductService.js';
 import { AppError, NotFoundError, ValidationError } from '../errors/customErrors.js';
-import logger from '../utils/logger.js';
+import logger from '../config/logger.js';
 
 /**
  * LibraryController - Handles user library-related API endpoints

@@ -1,6 +1,6 @@
 import Product from '../models/Product.js';
 import { AppError, NotFoundError, ValidationError } from '../errors/customErrors.js';
-import logger from '../utils/logger.js';
+import logger from '../config/logger.js';
 
 /**
  * ProductService - Universal product operations

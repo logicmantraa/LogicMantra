@@ -1,4 +1,5 @@
 import { ValidationError } from '../errors/customErrors.js';
+import logger from '../config/logger.js';
 
 /**
  * Validation Middleware - Simple validation utilities

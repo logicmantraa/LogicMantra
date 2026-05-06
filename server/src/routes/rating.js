@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   submitRating,
-  getCourseRatings,
+  getProductRatings,
   getMyRating,
   updateRating,
   deleteRating
@@ -13,8 +13,8 @@ const router = express.Router();
 router.route('/')
   .post(protect, submitRating);
 
-router.get('/course/:courseId', getCourseRatings);
-router.get('/course/:courseId/my-rating', protect, getMyRating);
+router.get('/product/:productId', getProductRatings);
+router.get('/product/:productId/my-rating', protect, getMyRating);
 
 router.route('/:id')
   .put(protect, updateRating)

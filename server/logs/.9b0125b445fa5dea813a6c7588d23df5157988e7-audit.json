@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "D:\\LogicMantraa\\server\\logs\\.9b0125b445fa5dea813a6c7588d23df5157988e7-audit.json",
+    "files": [
+        {
+            "date": 1778101202856,
+            "name": "D:\\LogicMantraa\\server\\logs\\rejections-2026-05-07.log",
+            "hash": "e6aa9ce3da3337309d64e4ab0f7050ecc4d1c8aa2f78b98e8786e81c2598866e"
+        }
+    ],
+    "hashType": "sha256"
+}

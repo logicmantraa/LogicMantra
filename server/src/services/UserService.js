@@ -1,5 +1,6 @@
 import User from '../models/User.js';
-import Enrollment from '../models/Enrollment.js';
+import UserProductAccess from '../models/UserProductAccess.js';
+import Product from '../models/Product.js';
 
 /**
  * UserService - Handles all user-related business logic
@@ -23,14 +24,14 @@ class UserService {
       return { isSubscribed: true, reason: 'active_subscription' };
     }
     
-    // Check if user has enrolled in any paid courses
-    const enrollments = await Enrollment.find({ userId }).populate('courseId');
-    const hasPaidEnrollment = enrollments.some(
-      enrollment => enrollment.courseId && !enrollment.courseId.isFree && enrollment.courseId.price > 0
+    // Check if user has purchased any paid products
+    const accesses = await UserProductAccess.find({ userId }).populate('productId');
+    const hasPaidAccess = accesses.some(
+      access => access.productId && !access.productId.isFree && access.productId.price > 0
     );
     
-    if (hasPaidEnrollment) {
-      return { isSubscribed: true, reason: 'paid_course_enrollment' };
+    if (hasPaidAccess) {
+      return { isSubscribed: true, reason: 'paid_product_access' };
     }
     
     return { isSubscribed: false, reason: 'no_paid_content' };
