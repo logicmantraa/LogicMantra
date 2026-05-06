@@ -37,6 +37,12 @@ export const createIndexes = async () => {
     // Contact collection indexes
     await createContactIndexes(db);
     
+    // Product collection indexes
+    await createProductIndexes(db);
+    
+    // UserProductAccess collection indexes
+    await createUserProductAccessIndexes(db);
+    
     logger.info('All database indexes created successfully');
     
     // Log index statistics
@@ -408,11 +414,99 @@ const createContactIndexes = async (db) => {
 };
 
 /**
+ * Create Product collection indexes
+ */
+const createProductIndexes = async (db) => {
+  const productCollection = db.collection('products');
+  
+  const indexes = [
+    // Text index for search functionality
+    { 
+      key: { 
+        title: 'text', 
+        description: 'text'
+      }, 
+      name: 'product_search_index',
+      default_language: 'none'
+    },
+    
+    // Product type and category compound index
+    { key: { productType: 1, category: 1 }, name: 'product_type_category_index' },
+    
+    // Status index for filtering published products
+    { key: { status: 1 }, name: 'product_status_index' },
+    
+    // Rating index for sorting top-rated products
+    { key: { rating: -1 }, name: 'product_rating_index' },
+    
+    // Created by index for ownership queries
+    { key: { createdBy: 1 }, name: 'product_created_by_index' },
+    
+    // Created at index for sorting
+    { key: { createdAt: -1 }, name: 'product_created_at_index' }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await productCollection.createIndex(index.key, { 
+        name: index.name, 
+        unique: index.unique || false,
+        background: true 
+      });
+      logger.debug(`Created product index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create product index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
+ * Create UserProductAccess collection indexes
+ */
+const createUserProductAccessIndexes = async (db) => {
+  const userProductAccessCollection = db.collection('userproductaccesses');
+  
+  const indexes = [
+    // Unique compound index for user-product access
+    { 
+      key: { userId: 1, productId: 1 }, 
+      name: 'user_product_access_index',
+      unique: true 
+    },
+    
+    // User library index for user's library queries
+    { key: { userId: 1, isInLibrary: 1 }, name: 'user_library_index' },
+    
+    // Last accessed index for recent activity
+    { key: { lastAccessedAt: -1 }, name: 'last_accessed_index' },
+    
+    // Status index for active/revoked filtering
+    { key: { status: 1 }, name: 'access_status_index' },
+    
+    // Created at index for sorting
+    { key: { createdAt: -1 }, name: 'access_created_at_index' }
+  ];
+  
+  for (const index of indexes) {
+    try {
+      await userProductAccessCollection.createIndex(index.key, { 
+        name: index.name, 
+        unique: index.unique || false,
+        background: true 
+      });
+      logger.debug(`Created userproductaccess index: ${index.name}`);
+    } catch (error) {
+      logger.warn(`Failed to create userproductaccess index ${index.name}:`, error.message);
+    }
+  }
+};
+
+/**
  * Log index statistics for monitoring
  */
 const logIndexStatistics = async (db) => {
   try {
-    const collections = ['users', 'courses', 'enrollments', 'ratings', 'pendingregistrations', 'passwordresets', 'contacts'];
+    const collections = ['users', 'courses', 'enrollments', 'ratings', 'pendingregistrations', 'passwordresets', 'contacts', 'products', 'userproductaccesses'];
     
     for (const collectionName of collections) {
       try {

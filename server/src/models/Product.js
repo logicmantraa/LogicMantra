@@ -54,11 +54,6 @@ const productSchema = new mongoose.Schema({
     default: {}
   },
   
-  // Engagement metrics
-  accessCount: {
-    type: Number,
-    default: 0
-  },
   rating: {
     type: Number,
     default: 0,
@@ -83,6 +78,19 @@ const productSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+
+// Pre-validation middleware for isFree consistency
+productSchema.pre('validate', function(next) {
+  if (this.price === 0 && this.isFree === false) {
+    return next(new Error('Free product must have isFree=true'));
+  }
+
+  if (this.price > 0 && this.isFree === true) {
+    return next(new Error('Paid product cannot be marked as free'));
+  }
+
+  next();
+});
 
 // Optimized indexes for performance
 productSchema.index({ title: 'text', description: 'text' });

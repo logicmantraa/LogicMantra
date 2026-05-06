@@ -60,44 +60,8 @@ const userProductAccessSchema = new mongoose.Schema({
     max: 100
   },
   progressData: {
-    // Course-specific progress
-    completedLectures: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Lecture'
-    }],
-    currentLecture: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Lecture'
-    },
-    
-    // Test series progress
-    completedTests: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Test'
-    }],
-    bestScores: [{
-      testId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Test'
-      },
-      score: Number,
-      completedAt: Date
-    }],
-    
-    // PDF/Ebook progress
-    lastPageRead: Number,
-    bookmarks: [{
-      pageNumber: Number,
-      note: String,
-      createdAt: {
-        type: Date,
-        default: Date.now
-      }
-    }],
-    
-    // Practice quiz progress
-    completedQuestions: [Number],
-    currentQuestion: Number
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
   },
   
   // Metadata and timestamps
