@@ -5,6 +5,9 @@ import generateToken from '../utils/generateToken.js';
 import generateOTP from '../utils/generateOTP.js';
 import { sendEmail } from '../config/email.js';
 import { getOTPEmailTemplate } from '../utils/emailTemplates.js';
+import BadRequestError from '../errors/BadRequestError.js';
+import NotFoundError from '../errors/NotFoundError.js';
+import UnauthorizedError from '../errors/UnauthorizedError.js';
 
 /**
  * AuthService - Handles all authentication business logic
@@ -27,7 +30,7 @@ class AuthService {
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      throw new Error('User already exists');
+      throw BadRequestError.duplicate('User', email);
     }
 
     // Generate OTP
@@ -73,7 +76,7 @@ class AuthService {
     const { email, otp } = otpData;
 
     if (!email || !otp) {
-      throw new Error('Please provide email and OTP');
+      throw BadRequestError.missingFields(['email', 'otp']);
     }
 
     const pendingUser = await PendingRegistration.findOne({ 
@@ -83,7 +86,7 @@ class AuthService {
     });
 
     if (!pendingUser) {
-      throw new Error('Invalid or expired OTP');
+      throw UnauthorizedError.otpVerificationFailed();
     }
 
     // Create user in main collection
@@ -100,7 +103,7 @@ class AuthService {
     await PendingRegistration.deleteOne({ _id: pendingUser._id });
 
     if (!user) {
-      throw new Error('Failed to create user');
+      throw new BadRequestError('Failed to create user account', 'USER_CREATION_FAILED');
     }
 
     return {
@@ -123,7 +126,7 @@ class AuthService {
     const pendingUser = await PendingRegistration.findOne({ email: email.toLowerCase() });
 
     if (!pendingUser) {
-      throw new Error('No pending registration found for this email');
+      throw NotFoundError.pendingRegistration(email);
     }
 
     const otp = generateOTP();
@@ -162,7 +165,7 @@ class AuthService {
         token: generateToken(user._id),
       };
     } else {
-      throw new Error('Invalid email or password');
+      throw UnauthorizedError.invalidCredentials();
     }
   }
 
@@ -175,7 +178,7 @@ class AuthService {
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      throw new Error('User with this email does not exist');
+      throw NotFoundError.user(email);
     }
 
     const otp = generateOTP();
@@ -209,7 +212,7 @@ class AuthService {
     const { email, otp, newPassword } = resetData;
 
     if (!email || !otp || !newPassword) {
-      throw new Error('Please provide email, OTP and new password');
+      throw BadRequestError.missingFields(['email', 'otp', 'newPassword']);
     }
 
     const resetRequest = await PasswordReset.findOne({
@@ -219,12 +222,12 @@ class AuthService {
     });
 
     if (!resetRequest) {
-      throw new Error('Invalid or expired OTP');
+      throw UnauthorizedError.otpVerificationFailed();
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      throw new Error('User not found');
+      throw NotFoundError.user(email);
     }
 
     user.password = newPassword;
@@ -244,7 +247,7 @@ class AuthService {
   static async getUserProfile(userId) {
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw NotFoundError.user(userId);
     }
 
     return {
@@ -265,7 +268,7 @@ class AuthService {
   static async updateUserProfile(userId, updateData) {
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw NotFoundError.user(userId);
     }
 
     user.name = updateData.name || user.name;
@@ -299,16 +302,16 @@ class AuthService {
   static async updatePassword(userId, passwordData) {
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw NotFoundError.user(userId);
     }
 
     const { currentPassword, newPassword } = passwordData;
     if (!currentPassword || !newPassword) {
-      throw new Error('Please provide current password and new password');
+      throw BadRequestError.missingFields(['currentPassword', 'newPassword']);
     }
 
     if (!(await user.matchPassword(currentPassword))) {
-      throw new Error('Current password is incorrect');
+      throw UnauthorizedError.invalidCredentials('Current password is incorrect');
     }
 
     user.password = newPassword;
