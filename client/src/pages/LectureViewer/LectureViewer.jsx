@@ -1,43 +1,43 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { courseAPI, enrollmentAPI } from '../../utils/api'
+import { productAPI, accessAPI } from '../../utils/api'
 import { useAuth } from '../../context/AuthContext'
 import PageShell from '../../components/Layout/PageShell'
 import ProtectedRoute from '../../components/ProtectedRoute/ProtectedRoute'
 import styles from './LectureViewer.module.css'
 
 export default function LectureViewer() {
-  const { courseId, lectureId } = useParams()
+  const { productId, lectureId } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [course, setCourse] = useState(null)
+  const [product, setProduct] = useState(null)
   const [lectures, setLectures] = useState([])
   const [currentLecture, setCurrentLecture] = useState(null)
   const [resources, setResources] = useState([])
-  const [enrolled, setEnrolled] = useState(false)
-  const [enrollment, setEnrollment] = useState(null)
+  const [hasAccess, setHasAccess] = useState(false)
+  const [access, setAccess] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadData()
-  }, [courseId, lectureId])
+  }, [productId, lectureId])
 
   const loadData = async () => {
     try {
-      const courseData = await courseAPI.getCourseById(courseId)
-      setCourse(courseData.course)
-      setLectures(courseData.lectures)
+      const productData = await productAPI.getProductById(productId)
+      setProduct(productData.product)
+      setLectures(productData.lectures || [])
 
-      const lecture = courseData.lectures.find((l) => l._id === lectureId)
+      const lecture = productData.lectures?.find((l) => l._id === lectureId)
       setCurrentLecture(lecture)
 
-      const lectureResources = courseData.resources.filter((r) => r.lectureId === lectureId)
+      const lectureResources = productData.resources?.filter((r) => r.lectureId === lectureId) || []
       setResources(lectureResources)
 
       if (user) {
-        const enrollmentData = await enrollmentAPI.checkEnrollment(courseId)
-        setEnrolled(enrollmentData.enrolled)
-        setEnrollment(enrollmentData.enrollment)
+        const accessData = await accessAPI.checkAccess(productId)
+        setHasAccess(accessData.hasAccess)
+        setAccess(accessData.access)
       }
     } catch (err) {
       console.error('Failed to load data:', err)
@@ -59,27 +59,27 @@ export default function LectureViewer() {
   const goToNext = () => {
     const currentIndex = getCurrentIndex()
     if (currentIndex < lectures.length - 1) {
-      navigate(`/courses/${courseId}/lectures/${lectures[currentIndex + 1]._id}`)
+      navigate(`/products/${productId}/lectures/${lectures[currentIndex + 1]._id}`)
     }
   }
 
   const goToPrevious = () => {
     const currentIndex = getCurrentIndex()
     if (currentIndex > 0) {
-      navigate(`/courses/${courseId}/lectures/${lectures[currentIndex - 1]._id}`)
+      navigate(`/products/${productId}/lectures/${lectures[currentIndex - 1]._id}`)
     }
   }
 
   const markAsComplete = async () => {
-    if (!enrolled || !currentLecture || !enrollment) return
+    if (!hasAccess || !currentLecture || !access) return
 
     try {
       // Backend will automatically calculate progress based on completed lectures / total lectures
-      await enrollmentAPI.updateProgress(enrollment._id, currentLecture._id)
+      await accessAPI.updateProgress(access._id, { lectureId: currentLecture._id })
 
-      // Reload enrollment data to get updated progress
-      const enrollmentData = await enrollmentAPI.checkEnrollment(courseId)
-      setEnrollment(enrollmentData.enrollment)
+      // Reload access data to get updated progress
+      const accessData = await accessAPI.checkAccess(productId)
+      setAccess(accessData.access)
 
       alert('Lecture marked as complete!')
     } catch (err) {
@@ -107,9 +107,9 @@ export default function LectureViewer() {
     }
 
     try {
-      await enrollmentAPI.enroll(courseId)
-      setEnrolled(true)
-      alert('Successfully enrolled! You can now access the course content.')
+      await accessAPI.addToLibrary(productId)
+      setHasAccess(true)
+      alert('Successfully added to your library! You can now access the product content.')
       // Reload data to show the lecture
       loadData()
     } catch (err) {
@@ -117,13 +117,13 @@ export default function LectureViewer() {
     }
   }
 
-  if (!enrolled && !currentLecture?.isPreview) {
+  if (!hasAccess && !currentLecture?.isPreview) {
     return (
       <ProtectedRoute>
         <PageShell contentClassName={styles.container}>
           <div className={styles.header}>
-            <Link to={`/courses/${courseId}`} className={styles.backLink}>
-              ← Back to Course
+            <Link to={`/products/${productId}`} className={styles.backLink}>
+              ← Back to Product
             </Link>
           </div>
           
@@ -135,16 +135,16 @@ export default function LectureViewer() {
               </svg>
             </div>
             
-            <h1 className={styles.restrictedTitle}>Enroll to Access Course Content</h1>
+            <h1 className={styles.restrictedTitle}>Get Access to View Product Content</h1>
             <p className={styles.restrictedSubtitle}>
-              This course requires enrollment. Join now to unlock all lectures, resources, and start your learning journey!
+              This product requires access. Add it to your library to unlock all lectures, resources, and start your learning journey!
             </p>
 
-            {course && (
+            {product && (
               <div className={styles.coursePreview}>
                 <div className={styles.coursePreviewHeader}>
-                  <h2>{course.title}</h2>
-                  <p className={styles.instructor}>By {course.instructor}</p>
+                  <h2>{product.title}</h2>
+                  <p className={styles.instructor}>By {product.instructor || 'Logic Mantraa'}</p>
                 </div>
                 
                 <div className={styles.courseStats}>

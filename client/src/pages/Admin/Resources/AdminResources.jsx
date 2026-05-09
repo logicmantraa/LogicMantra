@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
-import { resourceAPI, lectureAPI } from '../../../utils/api'
+import { resourceAPI, lectureAPI, productAPI } from '../../../utils/api'
 import PageShell from '../../../components/Layout/PageShell'
 import AdminRoute from '../../../components/AdminRoute/AdminRoute'
 import styles from './AdminResources.module.css'
 
 export default function AdminResources() {
-  const [courses, setCourses] = useState([])
+  const [products, setProducts] = useState([])
   const [lectures, setLectures] = useState([])
-  const [selectedCourse, setSelectedCourse] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedLecture, setSelectedLecture] = useState('')
   const [resources, setResources] = useState([])
   const [showForm, setShowForm] = useState(false)
@@ -20,31 +20,31 @@ export default function AdminResources() {
   })
 
   useEffect(() => {
-    loadCourses()
+    loadProducts()
   }, [])
 
   useEffect(() => {
-    if (selectedCourse) {
-      loadLectures(selectedCourse)
-      loadResources(selectedCourse, selectedLecture)
+    if (selectedProduct) {
+      loadLectures(selectedProduct)
+      loadResources(selectedProduct, selectedLecture)
     }
-  }, [selectedCourse, selectedLecture])
+  }, [selectedProduct, selectedLecture])
 
-  const loadCourses = async () => {
+  const loadProducts = async () => {
     try {
-      const data = await lectureAPI.getCourses()
-      setCourses(data)
+      const data = await productAPI.getProducts()
+      setProducts(data)
       if (data.length > 0) {
-        setSelectedCourse(data[0]._id)
+        setSelectedProduct(data[0]._id)
       }
     } catch (err) {
-      console.error('Failed to load courses:', err)
+      console.error('Failed to load products:', err)
     }
   }
 
-  const loadLectures = async (courseId) => {
+  const loadLectures = async (productId) => {
     try {
-      const lectureData = await lectureAPI.getLectures(courseId)
+      const lectureData = await lectureAPI.getLecturesByProduct(productId)
       setLectures(lectureData)
       setSelectedLecture(lectureData.length > 0 ? lectureData[0]._id : '')
     } catch (err) {
@@ -52,9 +52,9 @@ export default function AdminResources() {
     }
   }
 
-  const loadResources = async (courseId, lectureId) => {
+  const loadResources = async (productId, lectureId) => {
     try {
-      const params = { courseId }
+      const params = { productId }
       if (lectureId) {
         params.lectureId = lectureId
       }
@@ -70,7 +70,7 @@ export default function AdminResources() {
     try {
       const payload = {
         ...formData,
-        courseId: selectedCourse,
+        productId: selectedProduct,
         lectureId: selectedLecture || null
       }
       if (editingResource) {
@@ -81,7 +81,7 @@ export default function AdminResources() {
       setShowForm(false)
       setEditingResource(null)
       setFormData({ name: '', description: '', type: 'notes', fileUrl: '' })
-      loadResources(selectedCourse, selectedLecture)
+      loadResources(selectedProduct, selectedLecture)
     } catch (err) {
       alert(err.message || 'Failed to save resource')
     }
@@ -103,7 +103,7 @@ export default function AdminResources() {
     if (!window.confirm('Delete this resource?')) return
     try {
       await resourceAPI.deleteResource(resourceId)
-      loadResources(selectedCourse, selectedLecture)
+      loadResources(selectedProduct, selectedLecture)
     } catch (err) {
       alert(err.message || 'Failed to delete resource')
     }
@@ -127,11 +127,11 @@ export default function AdminResources() {
 
         <div className={styles.filters}>
           <div className={styles.filterGroup}>
-            <label>Course</label>
-            <select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)}>
-              {courses.map((course) => (
-                <option key={course._id} value={course._id}>
-                  {course.title}
+            <label>Product</label>
+            <select value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)}>
+              {products.map((product) => (
+                <option key={product._id} value={product._id}>
+                  {product.title}
                 </option>
               ))}
             </select>

@@ -1,0 +1,247 @@
+.filters {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.filters.expanded {
+  position: sticky;
+  top: 2rem;
+  z-index: 10;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.clearBtn {
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  color: #666;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clearBtn:hover {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.toggleBtn {
+  padding: 0.5rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleBtn:hover {
+  background: #4338ca;
+}
+
+.filterContent {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.filterInput,
+.filterSelect {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: white;
+}
+
+.filterInput:focus,
+.filterSelect:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.filterInput::placeholder {
+  color: #9ca3af;
+}
+
+.customPriceRange {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.priceInputs {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.priceInput {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: white;
+}
+
+.priceInput:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.priceSeparator {
+  color: #666;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .filters {
+    padding: 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .headerActions {
+    justify-content: center;
+  }
+  
+  .filterContent {
+    gap: 1rem;
+  }
+  
+  .priceInputs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .priceSeparator {
+    text-align: center;
+  }
+}
+
+/* Collapsed state for mobile */
+@media (max-width: 640px) {
+  .filters:not(.expanded) .filterContent {
+    display: none;
+  }
+  
+  .filters:not(.expanded) {
+    padding: 1rem;
+  }
+  
+  .filters:not(.expanded) .header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+/* Animation for expand/collapse */
+.filterContent {
+  max-height: 1000px;
+  opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+@media (max-width: 640px) {
+  .filters:not(.expanded) .filterContent {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+}
+
+/* Hover states */
+.filterGroup:hover label {
+  color: #4f46e5;
+  transition: color 0.2s;
+}
+
+/* Active filter indicators */
+.filterInput:valid:not(:placeholder-shown),
+.filterSelect:valid {
+  border-color: #10b981;
+}
+
+/* Loading state */
+.filters.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.filters.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #4f46e5;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

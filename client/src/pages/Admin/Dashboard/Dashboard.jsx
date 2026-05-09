@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { adminAPI } from '../../../utils/api'
+import { Link } from 'react-router-dom'
+import { productAPI } from '../../../utils/api'
 import PageShell from '../../../components/Layout/PageShell'
 import AdminRoute from '../../../components/AdminRoute/AdminRoute'
 import styles from './Dashboard.module.css'
@@ -67,14 +68,14 @@ export default function Dashboard() {
             <p className={styles.statChange}>+{stats.newUsers} this month</p>
           </div>
           <div className={styles.statCard}>
-            <h3>Total Courses</h3>
-            <p className={styles.statValue}>{stats.totalCourses}</p>
-            <p className={styles.statChange}>Active courses</p>
+            <h3>Total Products</h3>
+            <p className={styles.statValue}>{stats.totalProducts}</p>
+            <p className={styles.statChange}>Active products</p>
           </div>
           <div className={styles.statCard}>
-            <h3>Total Enrollments</h3>
-            <p className={styles.statValue}>{stats.totalEnrollments}</p>
-            <p className={styles.statChange}>+{stats.recentEnrollments} this week</p>
+            <h3>Total Access</h3>
+            <p className={styles.statValue}>{stats.totalAccess}</p>
+            <p className={styles.statChange}>+{stats.recentAccess} this week</p>
           </div>
           <div className={styles.statCard}>
             <h3>New Users</h3>
@@ -82,8 +83,8 @@ export default function Dashboard() {
             <p className={styles.statChange}>Last 30 days</p>
           </div>
           <div className={styles.statCard}>
-            <h3>Recent Enrollments</h3>
-            <p className={styles.statValue}>{stats.recentEnrollments}</p>
+            <h3>Recent Access</h3>
+            <p className={styles.statValue}>{stats.recentAccess}</p>
             <p className={styles.statChange}>Last 7 days</p>
           </div>
           <div className={styles.statCard}>
@@ -95,14 +96,14 @@ export default function Dashboard() {
 
         <div className={styles.sections}>
           <div className={styles.section}>
-            <h2>Popular Courses</h2>
-            {stats.popularCourses.length === 0 ? (
-              <p>No courses yet</p>
+            <h2>Popular Products</h2>
+            {stats.popularProducts.length === 0 ? (
+              <p>No products yet</p>
             ) : (
               <ul className={styles.list}>
-                {stats.popularCourses.map((course) => (
-                  <li key={course._id}>
-                    <strong>{course.title}</strong> – {course.enrolledCount} enrollments
+                {stats.popularProducts.map((product) => (
+                  <li key={product._id}>
+                    <strong>{product.title}</strong> – {product.accessCount} users
                   </li>
                 ))}
               </ul>
@@ -110,14 +111,14 @@ export default function Dashboard() {
           </div>
 
           <div className={styles.section}>
-            <h2>Top Rated Courses</h2>
-            {stats.topRatedCourses.length === 0 ? (
+            <h2>Top Rated Products</h2>
+            {stats.topRatedProducts.length === 0 ? (
               <p>No ratings yet</p>
             ) : (
               <ul className={styles.list}>
-                {stats.topRatedCourses.map((course) => (
-                  <li key={course._id}>
-                    <strong>{course.title}</strong> – ★ {course.rating.toFixed(1)} ({course.totalRatings} ratings)
+                {stats.topRatedProducts.map((product) => (
+                  <li key={product._id}>
+                    <strong>{product.title}</strong> – ★ {product.rating.toFixed(1)} ({product.totalRatings} ratings)
                   </li>
                 ))}
               </ul>

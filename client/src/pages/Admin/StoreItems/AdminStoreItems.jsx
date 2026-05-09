@@ -1,32 +1,37 @@
 import { useState, useEffect } from 'react'
-import { storeAPI } from '../../../utils/api'
-import Navbar from '../../../components/Navbar/Navbar'
+import { productAPI } from '../../../utils/api'
+import PageShell from '../../../components/Layout/PageShell'
 import AdminRoute from '../../../components/AdminRoute/AdminRoute'
 import styles from './AdminStoreItems.module.css'
 
 export default function AdminStoreItems() {
-  const [items, setItems] = useState([])
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [editingItem, setEditingItem] = useState(null)
+  const [editingProduct, setEditingProduct] = useState(null)
+  const [filters, setFilters] = useState({
+    category: '',
+    productType: '',
+    search: ''
+  })
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: 0,
     fileUrl: '',
     category: '',
-    type: 'other',
+    productType: 'other',
     thumbnail: ''
   })
 
   useEffect(() => {
-    loadItems()
+    loadProducts()
   }, [])
 
-  const loadItems = async () => {
+  const loadProducts = async () => {
     try {
-      const data = await storeAPI.getStoreItems()
-      setItems(data)
+      const data = await productAPI.getProducts(filters)
+      setProducts(data || [])
     } catch (err) {
       console.error('Failed to load store items:', err)
     } finally {
@@ -37,50 +42,65 @@ export default function AdminStoreItems() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      if (editingItem) {
-        await storeAPI.updateStoreItem(editingItem._id, formData)
+      if (editingProduct) {
+        await productAPI.updateProduct(editingProduct._id, {
+          title: formData.name,
+          description: formData.description,
+          price: formData.price,
+          thumbnail: formData.thumbnail,
+          category: formData.category,
+          productType: formData.productType
+        })
       } else {
-        await storeAPI.createStoreItem(formData)
+        await productAPI.createProduct({
+          title: formData.name,
+          description: formData.description,
+          price: formData.price,
+          thumbnail: formData.thumbnail,
+          category: formData.category,
+          productType: formData.productType,
+          isFree: formData.price === 0
+        })
       }
       setShowForm(false)
-      setEditingItem(null)
+      setEditingProduct(null)
       setFormData({
         name: '',
         description: '',
         price: 0,
         fileUrl: '',
         category: '',
-        type: 'other',
+        productType: 'other',
         thumbnail: ''
       })
-      loadItems()
+      loadProducts()
     } catch (err) {
       alert(err.message || 'Failed to save store item')
     }
   }
 
-  const handleEdit = (item) => {
-    setEditingItem(item)
+  const handleEdit = (product) => {
+    setEditingProduct(product)
     setFormData({
-      name: item.name,
-      description: item.description || '',
-      price: item.price,
-      fileUrl: item.fileUrl,
-      category: item.category,
-      type: item.type,
-      thumbnail: item.thumbnail || ''
+      name: product.title,
+      description: product.description,
+      price: product.price || 0,
+      fileUrl: product.fileUrl || '',
+      category: product.category || '',
+      productType: product.productType || 'other',
+      thumbnail: product.thumbnail || ''
     })
     setShowForm(true)
   }
 
-  const handleDelete = async (itemId) => {
-    if (!window.confirm('Are you sure you want to delete this store item?')) {
+  const handleDelete = async (productId) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) {
       return
     }
 
     try {
-      await storeAPI.deleteStoreItem(itemId)
-      loadItems()
+      await productAPI.deleteProduct(productId)
+      loadProducts()
     } catch (err) {
       alert(err.message || 'Failed to delete store item')
     }
@@ -88,19 +108,18 @@ export default function AdminStoreItems() {
 
   return (
     <AdminRoute>
-      <Navbar />
-      <div className={styles.container}>
+      <PageShell contentClassName={styles.container}>
         <div className={styles.header}>
-          <h1>Manage Store Items</h1>
+          <h1>Manage Store Products</h1>
           <button onClick={() => setShowForm(true)} className={styles.addBtn}>
-            + Add New Item
+            + Add New Product
           </button>
         </div>
 
         {showForm && (
           <div className={styles.formModal} onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
             <div className={styles.formContent}>
-              <h2>{editingItem ? 'Edit Store Item' : 'New Store Item'}</h2>
+              <h2>{editingProduct ? 'Edit Product' : 'New Product'}</h2>
               <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
                   <label>Name</label>
@@ -145,12 +164,13 @@ export default function AdminStoreItems() {
                   <div className={styles.formGroup}>
                     <label>Type</label>
                     <select
-                      value={formData.type}
-                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                      value={formData.productType}
+                      onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
                     >
-                      <option value="pdf">PDF</option>
-                      <option value="video">Video</option>
+                      <option value="course">Course</option>
+                      <option value="ebook">E-book</option>
                       <option value="bundle">Bundle</option>
+                      <option value="workshop">Workshop</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
@@ -178,7 +198,7 @@ export default function AdminStoreItems() {
                   <button type="submit" className={styles.saveBtn}>Save</button>
                   <button type="button" onClick={() => {
                     setShowForm(false)
-                    setEditingItem(null)
+                    setEditingProduct(null)
                   }} className={styles.cancelBtn}>
                     Cancel
                   </button>
@@ -192,27 +212,27 @@ export default function AdminStoreItems() {
           <div className={styles.loading}>Loading...</div>
         ) : (
           <div className={styles.itemsGrid}>
-            {items.map((item) => (
-              <div key={item._id} className={styles.itemCard}>
-                {item.thumbnail && (
+            {products.map((product) => (
+              <div key={product._id} className={styles.itemCard}>
+                {product.thumbnail && (
                   <div className={styles.thumbnail}>
-                    <img src={item.thumbnail} alt={item.name} />
+                    <img src={product.thumbnail} alt={product.title} />
                   </div>
                 )}
                 <div className={styles.content}>
-                  <h3>{item.name}</h3>
-                  <p className={styles.description}>{item.description || 'No description'}</p>
+                  <h3>{product.title}</h3>
+                  <p className={styles.description}>{product.description || 'No description'}</p>
                   <div className={styles.meta}>
-                    <span className={styles.category}>{item.category}</span>
-                    <span className={styles.type}>{item.type}</span>
+                    <span className={styles.category}>{product.category}</span>
+                    <span className={styles.type}>{product.productType}</span>
                   </div>
                   <div className={styles.footer}>
-                    <span className={styles.price}>₹{item.price}</span>
+                    <span className={styles.price}>₹{product.price}</span>
                     <div className={styles.actions}>
-                      <button onClick={() => handleEdit(item)} className={styles.editBtn}>
+                      <button onClick={() => handleEdit(product)} className={styles.editBtn}>
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(item._id)} className={styles.deleteBtn}>
+                      <button onClick={() => handleDelete(product._id)} className={styles.deleteBtn}>
                         Delete
                       </button>
                     </div>
@@ -222,7 +242,7 @@ export default function AdminStoreItems() {
             ))}
           </div>
         )}
-      </div>
+      </PageShell>
     </AdminRoute>
   )
 }

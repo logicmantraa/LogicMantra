@@ -1,262 +1,259 @@
-import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { courseAPI, enrollmentAPI, ratingAPI, lectureAPI, resourceAPI } from '../../utils/api'
-import { useAuth } from '../../context/AuthContext'
-import PageShell from '../../components/Layout/PageShell'
-import Rating from '../../components/Rating/Rating'
-import styles from './CourseDetail.module.css'
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { productAPI, accessAPI, ratingAPI, lectureAPI, resourceAPI } from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
+import PageShell from '../../components/Layout/PageShell';
+import Rating from '../../components/Rating/Rating';
+import styles from './ProductDetail.module.css';
 
-export default function CourseDetail() {
-  const { id } = useParams()
-  const { user } = useAuth()
-  const [course, setCourse] = useState(null)
-  const [lectures, setLectures] = useState([])
-  const [resources, setResources] = useState([])
-  const [ratings, setRatings] = useState([])
-  const [enrolled, setEnrolled] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [enrolling, setEnrolling] = useState(false)
-  const [showLectureModal, setShowLectureModal] = useState(false)
-  const [showResourceModal, setShowResourceModal] = useState(false)
-  const [editingLecture, setEditingLecture] = useState(null)
-  const [editingResource, setEditingResource] = useState(null)
-  const [savingLecture, setSavingLecture] = useState(false)
-  const [savingResource, setSavingResource] = useState(false)
+export default function ProductDetail() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const [product, setProduct] = useState(null);
+  const [lectures, setLectures] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [ratings, setRatings] = useState([]);
+  const [hasAccess, setHasAccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [accessing, setAccessing] = useState(false);
+  const [showLectureModal, setShowLectureModal] = useState(false);
+  const [showResourceModal, setShowResourceModal] = useState(false);
+  const [editingLecture, setEditingLecture] = useState(null);
+  const [editingResource, setEditingResource] = useState(null);
+  const [savingLecture, setSavingLecture] = useState(false);
+  const [savingResource, setSavingResource] = useState(false);
   const [lectureForm, setLectureForm] = useState({
     title: '',
     description: '',
     videoUrl: '',
     order: 1,
     isPreview: false
-  })
+  });
   const [resourceForm, setResourceForm] = useState({
     name: '',
     type: 'notes',
     fileUrl: '',
     lectureId: ''
-  })
+  });
 
   useEffect(() => {
-    loadCourseData()
+    loadProductData();
     if (user) {
-      checkEnrollment()
+      checkAccess();
     }
-  }, [id, user])
+  }, [id, user]);
 
-  const loadCourseData = async () => {
+  const loadProductData = async () => {
     try {
-      const data = await courseAPI.getCourseById(id)
-      setCourse(data.course)
-      setLectures(data.lectures)
-      setResources(data.resources)
+      const data = await productAPI.getProductById(id);
+      setProduct(data.product);
+      setLectures(data.lectures || []);
+      setResources(data.resources || []);
 
-      const ratingsData = await ratingAPI.getCourseRatings(id)
-      setRatings(ratingsData)
+      const ratingsData = await ratingAPI.getProductRatings(id);
+      setRatings(ratingsData || []);
     } catch (err) {
-      console.error('Failed to load course:', err)
+      console.error('Failed to load product:', err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const checkEnrollment = async () => {
+  const checkAccess = async () => {
     try {
-      const data = await enrollmentAPI.checkEnrollment(id)
-      setEnrolled(data.enrolled)
+      const data = await accessAPI.checkAccess(id);
+      setHasAccess(data.hasAccess);
     } catch (err) {
-      console.error('Failed to check enrollment:', err)
+      console.error('Failed to check access:', err);
     }
-  }
+  };
 
-  const handleEnroll = async () => {
+  const handleGetAccess = async () => {
     if (!user) {
-      alert('Please login to enroll')
-      return
+      alert('Please login to get access');
+      return;
     }
 
-    setEnrolling(true)
+    setAccessing(true);
     try {
-      await enrollmentAPI.enroll(id)
-      setEnrolled(true)
-      alert('Successfully enrolled!')
+      await accessAPI.addToLibrary(id);
+      setHasAccess(true);
+      alert('Successfully added to your library!');
     } catch (err) {
-      alert(err.message || 'Failed to enroll')
+      alert(err.message || 'Failed to get access');
     } finally {
-      setEnrolling(false)
+      setAccessing(false);
     }
-  }
+  };
 
   const handleRatingSubmit = () => {
-    loadCourseData()
-  }
+    loadProductData();
+  };
 
   const openLectureModal = () => {
-    setEditingLecture(null)
+    setEditingLecture(null);
     setLectureForm({
       title: '',
       description: '',
       videoUrl: '',
       order: lectures.length + 1,
       isPreview: false
-    })
-    setShowLectureModal(true)
-  }
+    });
+    setShowLectureModal(true);
+  };
 
   const openEditLectureModal = (lecture) => {
-    setEditingLecture(lecture)
+    setEditingLecture(lecture);
     setLectureForm({
       title: lecture.title || '',
       description: lecture.description || '',
       videoUrl: lecture.videoUrl || '',
       order: lecture.order || 1,
       isPreview: Boolean(lecture.isPreview)
-    })
-    setShowLectureModal(true)
-  }
+    });
+    setShowLectureModal(true);
+  };
 
   const closeLectureModal = () => {
-    setShowLectureModal(false)
-    setEditingLecture(null)
-  }
+    setShowLectureModal(false);
+    setEditingLecture(null);
+  };
 
   const openResourceModal = () => {
-    setEditingResource(null)
+    setEditingResource(null);
     setResourceForm({
       name: '',
       type: 'notes',
       fileUrl: '',
       lectureId: ''
-    })
-    setShowResourceModal(true)
-  }
+    });
+    setShowResourceModal(true);
+  };
 
   const openEditResourceModal = (resource) => {
-    setEditingResource(resource)
+    setEditingResource(resource);
     setResourceForm({
       name: resource.name || '',
       type: resource.type || 'notes',
       fileUrl: resource.fileUrl || '',
       lectureId: resource.lectureId?._id || resource.lectureId || ''
-    })
-    setShowResourceModal(true)
-  }
+    });
+    setShowResourceModal(true);
+  };
 
   const closeResourceModal = () => {
-    setShowResourceModal(false)
-    setEditingResource(null)
-  }
+    setShowResourceModal(false);
+    setEditingResource(null);
+  };
 
   const submitLecture = async (event) => {
-    event.preventDefault()
-    setSavingLecture(true)
+    event.preventDefault();
+    setSavingLecture(true);
     try {
       const payload = {
         ...lectureForm,
-        courseId: id,
+        productId: id,
         order: Number(lectureForm.order) || lectures.length + 1
-      }
+      };
       if (editingLecture) {
-        await lectureAPI.updateLecture(editingLecture._id, payload)
+        await lectureAPI.updateLecture(editingLecture._id, payload);
       } else {
-        await lectureAPI.createLecture(payload)
+        await lectureAPI.createLecture(payload);
       }
-      closeLectureModal()
-      await loadCourseData()
+      closeLectureModal();
+      await loadProductData();
     } catch (err) {
-      alert(err.message || 'Failed to save lecture')
+      alert(err.message || 'Failed to save lecture');
     } finally {
-      setSavingLecture(false)
+      setSavingLecture(false);
     }
-  }
+  };
 
   const submitResource = async (event) => {
-    event.preventDefault()
-    setSavingResource(true)
+    event.preventDefault();
+    setSavingResource(true);
     try {
       const payload = {
         ...resourceForm,
-        courseId: id,
+        productId: id,
         lectureId: resourceForm.lectureId || null
-      }
+      };
       if (editingResource) {
-        await resourceAPI.updateResource(editingResource._id, payload)
+        await resourceAPI.updateResource(editingResource._id, payload);
       } else {
-        await resourceAPI.createResource(payload)
+        await resourceAPI.createResource(payload);
       }
-      closeResourceModal()
-      await loadCourseData()
+      closeResourceModal();
+      await loadProductData();
     } catch (err) {
-      alert(err.message || 'Failed to save resource')
+      alert(err.message || 'Failed to save resource');
     } finally {
-      setSavingResource(false)
+      setSavingResource(false);
     }
-  }
+  };
 
   const handleResourceDelete = async (resource) => {
-    if (!window.confirm(`Delete "${resource.name}"?`)) return
+    if (!window.confirm(`Delete "${resource.name}"?`)) return;
     try {
-      await resourceAPI.deleteResource(resource._id)
-      await loadCourseData()
+      await resourceAPI.deleteResource(resource._id);
+      await loadProductData();
     } catch (err) {
-      alert(err.message || 'Failed to delete resource')
+      alert(err.message || 'Failed to delete resource');
     }
-  }
+  };
 
   const handleLectureDelete = async (lecture) => {
-    if (!window.confirm(`Delete lecture "${lecture.title}"?`)) return
+    if (!window.confirm(`Delete lecture "${lecture.title}"?`)) return;
     try {
-      await lectureAPI.deleteLecture(lecture._id)
-      await loadCourseData()
+      await lectureAPI.deleteLecture(lecture._id);
+      await loadProductData();
     } catch (err) {
-      alert(err.message || 'Failed to delete lecture')
+      alert(err.message || 'Failed to delete lecture');
     }
-  }
+  };
 
   if (loading) {
     return (
       <PageShell contentClassName={styles.container}>
-        <div className={styles.loading}>Loading course...</div>
+        <div className={styles.loading}>Loading product...</div>
       </PageShell>
-    )
+    );
   }
 
-  if (!course) {
+  if (!product) {
     return (
       <PageShell contentClassName={styles.container}>
-        <div className={styles.loading}>Course not found</div>
+        <div className={styles.loading}>Product not found</div>
       </PageShell>
-    )
+    );
   }
 
-  const averageRating = typeof course.rating === 'number' ? course.rating.toFixed(1) : 'New'
-  const ratingCount = course.totalRatings ?? ratings.length
+  const averageRating = typeof product.rating === 'number' ? product.rating.toFixed(1) : 'New';
+  const ratingCount = product.totalRatings ?? ratings.length;
 
   return (
     <PageShell contentClassName={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1>{course.title}</h1>
-          <p className={styles.instructor}>By {course.instructor}</p>
+          <h1>{product.title}</h1>
+          <p className={styles.instructor}>By {product.instructor || 'Logic Mantraa'}</p>
           <div className={styles.meta}>
-            <span>Level: {course.level}</span>
+            <span>Type: {product.productType || 'Course'}</span>
             <span>★ {averageRating} ({ratingCount} ratings)</span>
-            <span>{course.isFree ? 'Free' : `₹${course.price}`}</span>
+            <span>{product.isFree ? 'Free' : `₹${product.price}`}</span>
           </div>
         </div>
         <div className={styles.heroBadge}>
-          <span>Lectures</span>
-          <strong>{lectures.length}</strong>
+          <span>Content</span>
+          <strong>{lectures.length} items</strong>
         </div>
       </div>
-
-      {/* Future promotional banner — highlight course bundles & partner offers here - Commented out for v1 */}
-      {/* <div className={styles.adPlaceholder}>Future promotional banner — highlight course bundles & partner offers here.</div> */}
 
       <div className={styles.content}>
         <div className={styles.main}>
           <div className={styles.section}>
             <h2>Description</h2>
-            <p>{course.description}</p>
+            <p>{product.description}</p>
           </div>
 
           <div className={styles.section}>
@@ -275,7 +272,7 @@ export default function CourseDetail() {
                 {lectures.map((lecture, index) => (
                   <div key={lecture._id} className={styles.lectureItem}>
                     <Link
-                      to={`/courses/${id}/lectures/${lecture._id}`}
+                      to={`/products/${id}/lectures/${lecture._id}`}
                       className={styles.lectureLink}
                     >
                       <span className={styles.lectureNumber}>{index + 1}</span>
@@ -385,39 +382,39 @@ export default function CourseDetail() {
 
           {user && (
             <div className={styles.section}>
-              <Rating courseId={id} onRatingSubmit={handleRatingSubmit} />
+              <Rating productId={id} onRatingSubmit={handleRatingSubmit} />
             </div>
           )}
         </div>
 
         <aside className={styles.sidebar}>
-          <div className={styles.enrollBox}>
-            {enrolled ? (
+          <div className={styles.accessBox}>
+            {hasAccess ? (
               <div>
-                <h3>You are enrolled</h3>
+                <h3>You have access</h3>
                 {lectures.length > 0 ? (
-                  <Link to={`/courses/${id}/lectures/${lectures[0]._id}`} className={styles.startBtn}>
+                  <Link to={`/products/${id}/lectures/${lectures[0]._id}`} className={styles.startBtn}>
                     Start Learning
                   </Link>
                 ) : (
-                  <p>No lectures available yet</p>
+                  <p>No content available yet</p>
                 )}
               </div>
             ) : (
               <div>
-                <h3>{course.isFree ? 'Free Course' : `₹${course.price}`}</h3>
-                <button onClick={handleEnroll} disabled={enrolling} className={styles.enrollBtn}>
-                  {enrolling ? 'Enrolling...' : 'Enroll Now'}
+                <h3>{product.isFree ? 'Free Product' : `₹${product.price}`}</h3>
+                <button onClick={handleGetAccess} disabled={accessing} className={styles.accessBtn}>
+                  {accessing ? 'Getting Access...' : 'Get Access'}
                 </button>
-                {!course.isFree && (
+                {!product.isFree && (
                   <p className={styles.note}>Payment integration coming soon</p>
                 )}
               </div>
             )}
           </div>
 
-          <div className={styles.courseMetaBox}>
-            <h4>Course Highlights</h4>
+          <div className={styles.productMetaBox}>
+            <h4>Product Highlights</h4>
             <ul>
               <li>{lectures.length} video lectures</li>
               <li>{resources.length} resources</li>
@@ -558,6 +555,5 @@ export default function CourseDetail() {
 
       <div className={styles.addSpace}></div>
     </PageShell>
-  )
+  );
 }
-

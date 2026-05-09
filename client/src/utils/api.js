@@ -73,37 +73,40 @@ export const authAPI = {
   }),
 };
 
-// Course API
-export const courseAPI = {
-  getCourses: (params = {}) => {
+// Product API
+export const productAPI = {
+  getProducts: (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
-    return apiRequest(`/courses${queryString ? `?${queryString}` : ''}`);
+    return apiRequest(`/store${queryString ? `?${queryString}` : ''}`);
   },
-  getCourseById: (id) => apiRequest(`/courses/${id}`),
-  createCourse: (courseData) => apiRequest('/courses', {
+  getProductById: (id) => apiRequest(`/store/${id}`),
+  createProduct: (productData) => apiRequest('/store', {
     method: 'POST',
-    body: courseData,
+    body: productData,
   }),
-  updateCourse: (id, courseData) => apiRequest(`/courses/${id}`, {
+  updateProduct: (id, productData) => apiRequest(`/store/${id}`, {
     method: 'PUT',
-    body: courseData,
+    body: productData,
   }),
-  deleteCourse: (id) => apiRequest(`/courses/${id}`, {
+  deleteProduct: (id) => apiRequest(`/store/${id}`, {
     method: 'DELETE',
   }),
 };
 
-// Enrollment API
-export const enrollmentAPI = {
-  enroll: (courseId) => apiRequest('/enrollments', {
+// Access API (User Library)
+export const accessAPI = {
+  getMyLibrary: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/library${queryString ? `?${queryString}` : ''}`);
+  },
+  addToLibrary: (productId) => apiRequest('/library', {
     method: 'POST',
-    body: { courseId },
+    body: { productId },
   }),
-  getMyEnrollments: () => apiRequest('/enrollments/my-courses'),
-  checkEnrollment: (courseId) => apiRequest(`/enrollments/check/${courseId}`),
-  updateProgress: (enrollmentId, lectureId) => apiRequest(`/enrollments/${enrollmentId}/progress`, {
+  checkAccess: (productId) => apiRequest(`/library/check/${productId}`),
+  updateProgress: (accessId, progressData) => apiRequest(`/library/${accessId}/progress`, {
     method: 'PUT',
-    body: { lectureId },
+    body: progressData,
   }),
 };
 
@@ -113,8 +116,8 @@ export const ratingAPI = {
     method: 'POST',
     body: ratingData,
   }),
-  getCourseRatings: (courseId) => apiRequest(`/ratings/course/${courseId}`),
-  getMyRating: (courseId) => apiRequest(`/ratings/course/${courseId}/my-rating`),
+  getProductRatings: (productId) => apiRequest(`/ratings/product/${productId}`),
+  getMyRating: (productId) => apiRequest(`/ratings/product/${productId}/my-rating`),
   updateRating: (ratingId, ratingData) => apiRequest(`/ratings/${ratingId}`, {
     method: 'PUT',
     body: ratingData,
@@ -124,7 +127,7 @@ export const ratingAPI = {
   }),
 };
 
-// Store API
+// Store API (Updated for Product architecture)
 export const storeAPI = {
   getStoreItems: (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
@@ -161,44 +164,36 @@ export const userAPI = {
   checkSubscription: () => apiRequest('/users/check-subscription'),
 };
 
-// Lecture API
+// Lecture API (Updated for Product architecture)
 export const lectureAPI = {
-  // Compatibility helpers for admin views
-  getCourses: () => apiRequest('/courses'),
-  getLectures: (courseId) => apiRequest(`/lectures/course/${courseId}`),
-
-  getLecturesByCourse: (courseId) => apiRequest(`/lectures/course/${courseId}`),
+  getLecturesByProduct: (productId) => apiRequest(`/lectures/product/${productId}`),
   getLectureById: (id) => apiRequest(`/lectures/${id}`),
-  createLecture: (courseIdOrData, lectureData) => {
-    const payload = lectureData ? { ...lectureData, courseId: courseIdOrData } : courseIdOrData;
+  createLecture: (lectureData) => {
     return apiRequest('/lectures', {
-    method: 'POST',
-      body: payload,
+      method: 'POST',
+      body: lectureData,
     });
   },
-  updateLecture: (lectureIdOrCourseId, lectureIdOrData, maybeData) => {
-    const id = maybeData ? lectureIdOrData : lectureIdOrCourseId;
-    const payload = maybeData || lectureIdOrData;
-    return apiRequest(`/lectures/${id}`, {
-    method: 'PUT',
-      body: payload,
+  updateLecture: (lectureId, lectureData) => {
+    return apiRequest(`/lectures/${lectureId}`, {
+      method: 'PUT',
+      body: lectureData,
     });
   },
-  deleteLecture: (lectureIdOrCourseId, maybeLectureId) => {
-    const id = maybeLectureId || lectureIdOrCourseId;
-    return apiRequest(`/lectures/${id}`, {
-    method: 'DELETE',
+  deleteLecture: (lectureId) => {
+    return apiRequest(`/lectures/${lectureId}`, {
+      method: 'DELETE',
     });
   },
 };
 
-// Resource API
+// Resource API (Updated for Product architecture)
 export const resourceAPI = {
   getResources: (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
     return apiRequest(`/resources${queryString ? `?${queryString}` : ''}`);
   },
-  getResourcesByCourse: (courseId) => apiRequest(`/resources/course/${courseId}`),
+  getResourcesByProduct: (productId) => apiRequest(`/resources/product/${productId}`),
   getResourcesByLecture: (lectureId) => apiRequest(`/resources/lecture/${lectureId}`),
   getResourceById: (id) => apiRequest(`/resources/${id}`),
   createResource: (resourceData) => apiRequest('/resources', {

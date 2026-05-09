@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { productAPI } from '../../utils/api';
 import PageShell from '../../components/Layout/PageShell';
-import styles from './Store.module.css';
+import styles from './Products.module.css';
 
-export default function Store() {
+export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     category: '',
     productType: '',
-    priceRange: 'all',
+    minPrice: '',
+    maxPrice: '',
     search: ''
   });
 
@@ -26,8 +27,8 @@ export default function Store() {
       const data = await productAPI.getProducts(filters);
       setProducts(data || []);
     } catch (err) {
-      setError(err.message || 'Failed to load store products');
-      console.error('Failed to load store products:', err);
+      setError(err.message || 'Failed to load products');
+      console.error('Failed to load products:', err);
     } finally {
       setLoading(false);
     }
@@ -41,7 +42,8 @@ export default function Store() {
     setFilters({
       category: '',
       productType: '',
-      priceRange: 'all',
+      minPrice: '',
+      maxPrice: '',
       search: ''
     });
   };
@@ -49,7 +51,7 @@ export default function Store() {
   if (loading) {
     return (
       <PageShell contentClassName={styles.container}>
-        <div className={styles.loading}>Loading store...</div>
+        <div className={styles.loading}>Loading products...</div>
       </PageShell>
     );
   }
@@ -58,7 +60,7 @@ export default function Store() {
     return (
       <PageShell contentClassName={styles.container}>
         <div className={styles.error}>
-          <h3>Error loading store</h3>
+          <h3>Error loading products</h3>
           <p>{error}</p>
           <button onClick={loadProducts} className={styles.retryBtn}>
             Try Again
@@ -72,15 +74,15 @@ export default function Store() {
     <PageShell contentClassName={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1>Store</h1>
-          <p>Explore and purchase our premium learning products</p>
+          <h1>Products</h1>
+          <p>Discover our collection of courses and learning resources</p>
         </div>
       </div>
 
       <div className={styles.content}>
         <aside className={styles.sidebar}>
           <div className={styles.filters}>
-            <h3>Filter Products</h3>
+            <h3>Filters</h3>
             
             <div className={styles.filterGroup}>
               <label>Search</label>
@@ -105,7 +107,6 @@ export default function Store() {
                 <option value="design">Design</option>
                 <option value="business">Business</option>
                 <option value="marketing">Marketing</option>
-                <option value="data-science">Data Science</option>
               </select>
             </div>
 
@@ -121,48 +122,33 @@ export default function Store() {
                 <option value="ebook">E-book</option>
                 <option value="bundle">Bundle</option>
                 <option value="workshop">Workshop</option>
-                <option value="certification">Certification</option>
               </select>
             </div>
 
             <div className={styles.filterGroup}>
               <label>Price Range</label>
-              <select
-                value={filters.priceRange}
-                onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-                className={styles.filterSelect}
-              >
-                <option value="all">All Prices</option>
-                <option value="free">Free Only</option>
-                <option value="under-1000">Under ₹1000</option>
-                <option value="1000-5000">₹1000 - ₹5000</option>
-                <option value="over-5000">Over ₹5000</option>
-              </select>
+              <div className={styles.priceRange}>
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={filters.minPrice}
+                  onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                  className={styles.filterInput}
+                />
+                <span>-</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={filters.maxPrice}
+                  onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                  className={styles.filterInput}
+                />
+              </div>
             </div>
 
             <button onClick={clearFilters} className={styles.clearBtn}>
               Clear Filters
             </button>
-          </div>
-
-          <div className={styles.stats}>
-            <h3>Store Stats</h3>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>{products.length}</span>
-              <span className={styles.statLabel}>Products</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>
-                {products.filter(p => p.isFree).length}
-              </span>
-              <span className={styles.statLabel}>Free Products</span>
-            </div>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>
-                {products.filter(p => !p.isFree).length}
-              </span>
-              <span className={styles.statLabel}>Premium Products</span>
-            </div>
           </div>
         </aside>
 
@@ -170,7 +156,7 @@ export default function Store() {
           {products.length === 0 ? (
             <div className={styles.empty}>
               <h3>No products found</h3>
-              <p>Try adjusting your filters or check back later for new products</p>
+              <p>Try adjusting your filters or search terms</p>
             </div>
           ) : (
             <div className={styles.productGrid}>
@@ -181,59 +167,41 @@ export default function Store() {
                       <img src={product.thumbnail} alt={product.title} />
                     ) : (
                       <div className={styles.placeholderImage}>
-                        🛍️
+                        📚
                       </div>
-                    )}
-                    {product.isFree && (
-                      <div className={styles.freeBadge}>FREE</div>
-                    )}
-                    {product.productType && (
-                      <div className={styles.typeBadge}>{product.productType}</div>
                     )}
                   </div>
                   
                   <div className={styles.productContent}>
-                    <span className={styles.category}>{product.category}</span>
+                    <span className={styles.productType}>
+                      {product.productType || 'Course'}
+                    </span>
                     <h3 className={styles.productTitle}>
                       <Link to={`/products/${product._id}`}>
                         {product.title}
                       </Link>
                     </h3>
                     <p className={styles.productDescription}>
-                      {product.description?.substring(0, 120)}...
+                      {product.description?.substring(0, 150)}...
                     </p>
                     
                     <div className={styles.productMeta}>
+                      <span className={styles.category}>{product.category}</span>
                       <span className={styles.rating}>
                         ⭐ {product.rating?.toFixed(1) || 'New'}
-                        <span className={styles.ratingCount}>
-                          ({product.totalRatings || 0})
-                        </span>
-                      </span>
-                      <span className={styles.instructor}>
-                        By {product.instructor || 'Logic Mantraa'}
                       </span>
                     </div>
                     
                     <div className={styles.productFooter}>
-                      <div className={styles.priceInfo}>
-                        <span className={styles.price}>
-                          {product.isFree ? 'Free' : `₹${product.price}`}
-                        </span>
-                        {!product.isFree && product.originalPrice && (
-                          <span className={styles.originalPrice}>
-                            ₹{product.originalPrice}
-                          </span>
-                        )}
-                      </div>
-                      <div className={styles.actions}>
-                        <Link 
-                          to={`/products/${product._id}`}
-                          className={styles.viewBtn}
-                        >
-                          View Details
-                        </Link>
-                      </div>
+                      <span className={styles.price}>
+                        {product.isFree ? 'Free' : `₹${product.price}`}
+                      </span>
+                      <Link 
+                        to={`/products/${product._id}`}
+                        className={styles.viewBtn}
+                      >
+                        View Details
+                      </Link>
                     </div>
                   </div>
                 </div>
